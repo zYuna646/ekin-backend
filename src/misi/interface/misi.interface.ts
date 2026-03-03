@@ -4,7 +4,7 @@ export interface IMisi {
   id: string;
   name: string;
   desc?: string | null;
-  visi: IVisi;
+  visi?: IVisi;
   createdAt: Date;
   updatedAt: Date;
 }

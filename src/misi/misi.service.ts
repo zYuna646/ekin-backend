@@ -18,7 +18,7 @@ export class MisiService {
   private readonly logger = new Logger(MisiService.name);
   constructor(private prisma: PrismaService) {}
 
-  async checkData(id: string) {
+  async checkData(id: string): Promise<IMisi> {
     try {
       const data = await this.prisma.misi.findUnique({
         where: { id },

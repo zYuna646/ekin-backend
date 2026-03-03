@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { VisiModule } from './visi/visi.module';
 import { MisiModule } from './misi/misi.module';
+import { RenstraModule } from './renstra/renstra.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MisiModule } from './misi/misi.module';
     }),
     VisiModule,
     MisiModule,
+    RenstraModule,
   ],
   controllers: [AppController],
   providers: [AppService],

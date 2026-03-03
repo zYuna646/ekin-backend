@@ -40,7 +40,9 @@ model Renstra {
   id   String  @id @default(uuid())
   name String
   desc String?
-
+  startDate DateTime
+  endDate DateTime
+  unitId String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   renstraMisis RenstraMisi[]
@@ -51,7 +53,6 @@ model RenstraMisi {
   id        String @id @default(uuid())
   renstraId String
   misiId    String
-  unitId    String
 
   renstra Renstra @relation(fields: [renstraId], references: [id])
   misi    Misi    @relation(fields: [misiId], references: [id])
