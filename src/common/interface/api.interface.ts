@@ -1,8 +1,8 @@
-import { statusApi } from '../enum/status.enum';
+import { StatusApi } from '../enum/status.enum';
 
 export interface IPagination {
   page: number;
-  limit: number;
+  perPage: number;
   totalItems: number;
   totalPages: number;
 }
@@ -11,6 +11,6 @@ export interface IApiResponse<T> {
   data: T | null;
   message: string;
   code: number;
-  status: statusApi;
+  status: StatusApi;
   pagination?: IPagination | null;
 }

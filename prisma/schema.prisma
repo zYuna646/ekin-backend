@@ -11,3 +11,112 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Visi {
+  id   String  @id @default(uuid())
+  name String
+  desc String?
+
+  misi Misi[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Misi {
+  id   String  @id @default(uuid())
+  name String
+  desc String?
+
+  visiId String
+  visi   Visi   @relation(fields: [visiId], references: [id])
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  renstraMisis RenstraMisi[]
+}
+
+model Renstra {
+  id   String  @id @default(uuid())
+  name String
+  desc String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  renstraMisis RenstraMisi[]
+  tujuans      Tujuan[]
+}
+
+model RenstraMisi {
+  id        String @id @default(uuid())
+  renstraId String
+  misiId    String
+  unitId    String
+
+  renstra Renstra @relation(fields: [renstraId], references: [id])
+  misi    Misi    @relation(fields: [misiId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Indicator {
+  id     String @id @default(uuid())
+  name   String
+  target String
+  satuan String
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  tujuanIndicators  TujuanIndicator[]
+  programIndicators ProgramIndicator[]
+}
+
+model Tujuan {
+  id        String  @id @default(uuid())
+  name      String
+  unitId    String
+  renstraId String
+  renstra   Renstra @relation(fields: [renstraId], references: [id])
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  tujuanIndicators TujuanIndicator[]
+  programs         Program[]
+}
+
+model Program {
+  id            String @id @default(uuid())
+  name          String
+  totalAnggaran Float
+  tujuanId      String
+  tujuan        Tujuan @relation(fields: [tujuanId], references: [id])
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  programIndicators ProgramIndicator[]
+}
+
+model TujuanIndicator {
+  id          String @id @default(uuid())
+  tujuanId    String
+  indicatorId String
+
+  tujuan    Tujuan    @relation(fields: [tujuanId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProgramIndicator {
+  id          String @id @default(uuid())
+  programId   String
+  indicatorId String
+
+  program   Program   @relation(fields: [programId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

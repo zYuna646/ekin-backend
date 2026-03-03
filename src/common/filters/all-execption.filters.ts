@@ -8,7 +8,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { statusApi } from '../enum/status.enum';
+import { StatusApi } from '../enum/status.enum';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -18,7 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let code = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Internal server error';
-    const status: statusApi = statusApi.ERROR;
+    const status: StatusApi = StatusApi.ERROR;
 
     if (exception instanceof BadRequestException) {
       const response = exception.getResponse() as {
