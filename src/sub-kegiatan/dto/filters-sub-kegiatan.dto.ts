@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
-export class FiltersProgramDto {
+export class FiltersSubKegiatanDto {
   @IsString()
   @IsOptional()
   search?: string;
@@ -23,5 +23,5 @@ export class FiltersProgramDto {
   @IsOptional()
   @IsString()
   @IsUUID(4)
-  tujuanId?: string;
+  kegiatanId?: string;
 }

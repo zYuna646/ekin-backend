@@ -9,7 +9,7 @@ import {
 import { Type } from 'class-transformer';
 import { CreateIndicatorDto } from 'src/common/dto/create-indicator.dto';
 
-export class CreateProgramDto {
+export class CreateSubKegiatanDto {
   @IsString()
   name: string;
 
@@ -22,7 +22,7 @@ export class CreateProgramDto {
 
   @IsString()
   @IsUUID(4)
-  tujuanId: string;
+  kegiatanId: string;
 
   @IsOptional()
   @IsArray()

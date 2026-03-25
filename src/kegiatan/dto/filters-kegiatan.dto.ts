@@ -1,14 +1,10 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
-export class FiltersProgramDto {
+export class FiltersKegiatanDto {
   @IsString()
   @IsOptional()
   search?: string;
-
-  @IsOptional()
-  @IsString()
-  unitId?: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -22,6 +18,10 @@ export class FiltersProgramDto {
 
   @IsOptional()
   @IsString()
+  unitId?: string;
+
+  @IsOptional()
+  @IsString()
   @IsUUID(4)
-  tujuanId?: string;
+  programId?: string;
 }

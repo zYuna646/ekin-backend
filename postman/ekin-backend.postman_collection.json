@@ -442,7 +442,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"program\",\r\n    \"totalAnggaran\": 10000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\"\r\n}",
+              "raw": "{\r\n    \"name\": \"program\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"totalAnggaran\": 10000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -468,7 +468,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"program-update\",\r\n    \"totalAnggaran\": 20000000\r\n}",
+              "raw": "{\r\n    \"name\": \"program-update\",\r\n    \"unitId\": \"UNIT_002\",\r\n    \"totalAnggaran\": 20000000\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -501,6 +501,132 @@
               "path": [
                 "program",
                 "{{PROGRAM_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+    ,
+    {
+      "name": "KEGIATAN",
+      "item": [
+        {
+          "name": "GET ALL KEGIATAN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/kegiatan?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "kegiatan"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET KEGIATAN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/kegiatan/{{KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "kegiatan",
+                "{{KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE KEGIATAN",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"kegiatan\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"totalAnggaran\": 5000000,\r\n    \"programId\": \"{{PROGRAM_ID}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/kegiatan",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "kegiatan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE KEGIATAN",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"kegiatan-update\",\r\n    \"unitId\": \"UNIT_002\",\r\n    \"totalAnggaran\": 6000000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/kegiatan/{{KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "kegiatan",
+                "{{KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE KEGIATAN",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/kegiatan/{{KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "kegiatan",
+                "{{KEGIATAN_ID}}"
               ]
             }
           },
@@ -560,6 +686,11 @@
     },
     {
       "key": "PROGRAM_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "KEGIATAN_ID",
       "value": "",
       "type": "default"
     }

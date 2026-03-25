@@ -5,6 +5,7 @@ import { IIndicator } from 'src/common/interface/indicator.interface';
 export interface IProgram {
   id: string;
   name: string;
+  unitId: string;
   totalAnggaran: number;
   tujuanId: string;
   tujuan?: ITujuan;
@@ -18,6 +19,9 @@ export interface IProgramService {
   create(createProgramDto: any): Promise<IApiResponse<IProgram> | null>;
   findAll(filters: any): Promise<IApiResponse<IProgram[]> | null>;
   findOne(id: string): Promise<IApiResponse<IProgram> | null>;
-  update(id: string, updateProgramDto: any): Promise<IApiResponse<IProgram> | null>;
+  update(
+    id: string,
+    updateProgramDto: any,
+  ): Promise<IApiResponse<IProgram> | null>;
   remove(id: string): Promise<IApiResponse<IProgram> | null>;
 }

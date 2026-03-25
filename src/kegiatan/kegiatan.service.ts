@@ -8,50 +8,50 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { StatusApi } from 'src/common/enum/status.enum';
 import { Prisma } from '@prisma/client';
-import { IProgram, IProgramService } from './interface/program.interface';
-import { CreateProgramDto } from './dto/create-program.dto';
-import { UpdateProgramDto } from './dto/update-program.dto';
-import { FiltersProgramDto } from './dto/filters-program.dto';
+import { IKegiatan, IKegiatanService } from './interface/kegiatan.interface';
+import { CreateKegiatanDto } from './dto/create-kegiatan.dto';
+import { UpdateKegiatanDto } from './dto/update-kegiatan.dto';
+import { FiltersKegiatanDto } from './dto/filters-kegiatan.dto';
 
 @Injectable()
-export class ProgramService implements IProgramService {
-  private readonly logger = new Logger(ProgramService.name);
+export class KegiatanService implements IKegiatanService {
+  private readonly logger = new Logger(KegiatanService.name);
   constructor(private prisma: PrismaService) {}
 
-  async checkData(id: string): Promise<IProgram> {
+  async checkData(id: string): Promise<IKegiatan> {
     try {
-      const data = await this.prisma.program.findUnique({
+      const data = await this.prisma.kegiatan.findUnique({
         where: { id },
         include: {
-          tujuan: true,
-          programIndicators: {
+          program: true,
+          kegiatanIndicators: {
             include: { indicator: true },
           },
         },
       });
       if (!data) {
-        this.logger.warn(`Program with id ${id} not found`);
-        throw new NotFoundException(`Program with id ${id} not found`);
+        this.logger.warn(`Kegiatan with id ${id} not found`);
+        throw new NotFoundException(`Kegiatan with id ${id} not found`);
       }
-      const { programIndicators, ...program } = data as any;
-      const res: IProgram = {
-        ...program,
-        indicators: programIndicators?.map((pi: any) => pi.indicator) ?? [],
+      const { kegiatanIndicators, ...kegiatan } = data as any;
+      const res: IKegiatan = {
+        ...kegiatan,
+        indicators: kegiatanIndicators?.map((ki: any) => ki.indicator) ?? [],
       };
       return res;
     } catch (error) {
-      this.logger.error('Failed to retrieve program', error);
+      this.logger.error('Failed to retrieve kegiatan', error);
       throw error;
     }
   }
 
   async create(
-    createProgramDto: CreateProgramDto,
-  ): Promise<IApiResponse<IProgram> | null> {
+    createKegiatanDto: CreateKegiatanDto,
+  ): Promise<IApiResponse<IKegiatan> | null> {
     try {
-      const { indicators, ...programData } = createProgramDto;
-      const program = await this.prisma.program.create({
-        data: programData,
+      const { indicators, ...kegiatanData } = createKegiatanDto;
+      const kegiatan = await this.prisma.kegiatan.create({
+        data: kegiatanData,
       });
 
       if (indicators?.length) {
@@ -64,9 +64,9 @@ export class ProgramService implements IProgramService {
             createdIndicators.push(created.id);
           }
           if (createdIndicators.length) {
-            await tx.programIndicator.createMany({
+            await tx.kegiatanIndicator.createMany({
               data: createdIndicators.map((indicatorId) => ({
-                programId: program.id,
+                kegiatanId: kegiatan.id,
                 indicatorId,
               })),
             });
@@ -74,43 +74,43 @@ export class ProgramService implements IProgramService {
         });
       }
 
-      const data = await this.prisma.program.findUnique({
-        where: { id: program.id },
+      const data = await this.prisma.kegiatan.findUnique({
+        where: { id: kegiatan.id },
         include: {
-          tujuan: true,
-          programIndicators: {
+          program: true,
+          kegiatanIndicators: {
             include: { indicator: true },
           },
         },
       });
 
-      const { programIndicators, ...rest } = data as any;
-      const res: IProgram = {
+      const { kegiatanIndicators, ...rest } = data as any;
+      const res: IKegiatan = {
         ...rest,
-        indicators: programIndicators?.map((pi: any) => pi.indicator) ?? [],
+        indicators: kegiatanIndicators?.map((ki: any) => ki.indicator) ?? [],
       };
 
       return {
         data: res,
         code: HttpStatus.CREATED,
         status: StatusApi.SUCCESS,
-        message: 'Program created successfully',
+        message: 'Kegiatan created successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to create program', error);
+      this.logger.error('Failed to create kegiatan', error);
       throw error;
     }
   }
 
   async findAll(
-    filters: FiltersProgramDto,
-  ): Promise<IApiResponse<IProgram[]> | null> {
+    filters: FiltersKegiatanDto,
+  ): Promise<IApiResponse<IKegiatan[]> | null> {
     try {
-      const { search, unitId, tujuanId, page = 1, perPage = 10 } = filters;
+      const { search, unitId, programId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
         ...(unitId && { unitId }),
-        ...(tujuanId && { tujuanId }),
+        ...(programId && { programId }),
         ...(search && {
           OR: [
             { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
@@ -118,12 +118,12 @@ export class ProgramService implements IProgramService {
         }),
       };
       const [totalItems, data] = await this.prisma.$transaction([
-        this.prisma.program.count({ where }),
-        this.prisma.program.findMany({
+        this.prisma.kegiatan.count({ where }),
+        this.prisma.kegiatan.findMany({
           where,
           include: {
-            tujuan: true,
-            programIndicators: {
+            program: true,
+            kegiatanIndicators: {
               include: { indicator: true },
             },
           },
@@ -132,18 +132,18 @@ export class ProgramService implements IProgramService {
         }),
       ]);
       const totalPages = Math.ceil(totalItems / perPage);
-      const res: IProgram[] = (data as any[]).map((item) => {
-        const { programIndicators, ...program } = item;
+      const res: IKegiatan[] = (data as any[]).map((item) => {
+        const { kegiatanIndicators, ...kegiatan } = item;
         return {
-          ...program,
-          indicators: programIndicators?.map((pi: any) => pi.indicator) ?? [],
+          ...kegiatan,
+          indicators: kegiatanIndicators?.map((ki: any) => ki.indicator) ?? [],
         };
       });
       return {
         data: res,
         code: HttpStatus.OK,
         status: StatusApi.SUCCESS,
-        message: 'Program list retrieved successfully',
+        message: 'Kegiatan list retrieved successfully',
         pagination: {
           page,
           perPage,
@@ -152,42 +152,42 @@ export class ProgramService implements IProgramService {
         },
       };
     } catch (error) {
-      this.logger.error('Failed to retrieve program list', error);
+      this.logger.error('Failed to retrieve kegiatan list', error);
       throw error;
     }
   }
 
-  async findOne(id: string): Promise<IApiResponse<IProgram> | null> {
+  async findOne(id: string): Promise<IApiResponse<IKegiatan> | null> {
     try {
       const data = await this.checkData(id);
       return {
         data,
         code: HttpStatus.OK,
         status: StatusApi.SUCCESS,
-        message: 'Program retrieved successfully',
+        message: 'Kegiatan retrieved successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to retrieve program', error);
+      this.logger.error('Failed to retrieve kegiatan', error);
       throw error;
     }
   }
 
   async update(
     id: string,
-    updateProgramDto: UpdateProgramDto,
-  ): Promise<IApiResponse<IProgram> | null> {
+    updateKegiatanDto: UpdateKegiatanDto,
+  ): Promise<IApiResponse<IKegiatan> | null> {
     try {
       await this.checkData(id);
-      const { indicators, ...updateData } = updateProgramDto;
-      await this.prisma.program.update({
+      const { indicators, ...updateData } = updateKegiatanDto;
+      await this.prisma.kegiatan.update({
         where: { id },
         data: updateData,
       });
 
       if (indicators) {
         await this.prisma.$transaction(async (tx) => {
-          await tx.programIndicator.deleteMany({
-            where: { programId: id },
+          await tx.kegiatanIndicator.deleteMany({
+            where: { kegiatanId: id },
           });
           if (indicators.length) {
             const createdIndicators: string[] = [];
@@ -198,9 +198,9 @@ export class ProgramService implements IProgramService {
               createdIndicators.push(created.id);
             }
             if (createdIndicators.length) {
-              await tx.programIndicator.createMany({
+              await tx.kegiatanIndicator.createMany({
                 data: createdIndicators.map((indicatorId) => ({
-                  programId: id,
+                  kegiatanId: id,
                   indicatorId,
                 })),
               });
@@ -209,44 +209,44 @@ export class ProgramService implements IProgramService {
         });
       }
 
-      const data = await this.prisma.program.findUnique({
+      const data = await this.prisma.kegiatan.findUnique({
         where: { id },
         include: {
-          tujuan: true,
-          programIndicators: {
+          program: true,
+          kegiatanIndicators: {
             include: { indicator: true },
           },
         },
       });
-      const { programIndicators, ...rest } = data as any;
-      const updatedData: IProgram = {
+      const { kegiatanIndicators, ...rest } = data as any;
+      const updatedData: IKegiatan = {
         ...rest,
-        indicators: programIndicators?.map((pi: any) => pi.indicator) ?? [],
+        indicators: kegiatanIndicators?.map((ki: any) => ki.indicator) ?? [],
       };
       return {
         data: updatedData,
         code: HttpStatus.OK,
         status: StatusApi.SUCCESS,
-        message: 'Program updated successfully',
+        message: 'Kegiatan updated successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to update program', error);
+      this.logger.error('Failed to update kegiatan', error);
       throw error;
     }
   }
 
-  async remove(id: string): Promise<IApiResponse<IProgram> | null> {
+  async remove(id: string): Promise<IApiResponse<IKegiatan> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.program.delete({ where: { id } });
+      await this.prisma.kegiatan.delete({ where: { id } });
       return {
         data,
         code: HttpStatus.OK,
         status: StatusApi.SUCCESS,
-        message: 'Program deleted successfully',
+        message: 'Kegiatan deleted successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to delete program', error);
+      this.logger.error('Failed to delete kegiatan', error);
       throw error;
     }
   }

@@ -8,6 +8,8 @@ import { RenstraModule } from './renstra/renstra.module';
 import { TujuanModule } from './tujuan/tujuan.module';
 import { AuthModule } from './auth/auth.module';
 import { ProgramModule } from './program/program.module';
+import { KegiatanModule } from './kegiatan/kegiatan.module';
+import { SubKegiatanModule } from './sub-kegiatan/sub-kegiatan.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ProgramModule } from './program/program.module';
     TujuanModule,
     AuthModule,
     ProgramModule,
+    KegiatanModule,
+    SubKegiatanModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -91,6 +91,7 @@ model Tujuan {
 model Program {
   id            String @id @default(uuid())
   name          String
+  unitId        String
   totalAnggaran Float
   tujuanId      String
   tujuan        Tujuan @relation(fields: [tujuanId], references: [id])
@@ -104,6 +105,7 @@ model Program {
 model Kegiatan {
   id            String  @id @default(uuid())
   name          String
+  unitId        String
   totalAnggaran Float
   programId     String
   program       Program @relation(fields: [programId], references: [id])
@@ -117,6 +119,7 @@ model Kegiatan {
 model SubKegiatan {
   id            String   @id @default(uuid())
   name          String
+  unitId        String
   totalAnggaran Float
   kegiatanId    String
   kegiatan      Kegiatan @relation(fields: [kegiatanId], references: [id])
