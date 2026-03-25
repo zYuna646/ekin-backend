@@ -382,6 +382,132 @@
         }
       ]
     }
+    ,
+    {
+      "name": "PROGRAM",
+      "item": [
+        {
+          "name": "GET ALL PROGRAM",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/program?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "program"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET PROGRAM",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/program/{{PROGRAM_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "program",
+                "{{PROGRAM_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE PROGRAM",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"program\",\r\n    \"totalAnggaran\": 10000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/program",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "program"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE PROGRAM",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"program-update\",\r\n    \"totalAnggaran\": 20000000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/program/{{PROGRAM_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "program",
+                "{{PROGRAM_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE PROGRAM",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/program/{{PROGRAM_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "program",
+                "{{PROGRAM_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
   ],
   "event": [
     {
@@ -429,6 +555,11 @@
     },
     {
       "key": "RENSTRA_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "PROGRAM_ID",
       "value": "",
       "type": "default"
     }

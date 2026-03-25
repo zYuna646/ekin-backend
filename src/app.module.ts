@@ -7,6 +7,7 @@ import { MisiModule } from './misi/misi.module';
 import { RenstraModule } from './renstra/renstra.module';
 import { TujuanModule } from './tujuan/tujuan.module';
 import { AuthModule } from './auth/auth.module';
+import { ProgramModule } from './program/program.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
     RenstraModule,
     TujuanModule,
     AuthModule,
+    ProgramModule,
   ],
   controllers: [AppController],
   providers: [AppService],

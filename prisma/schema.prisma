@@ -37,12 +37,12 @@ model Misi {
 }
 
 model Renstra {
-  id   String  @id @default(uuid())
-  name String
-  desc String?
-  startDate DateTime
-  endDate DateTime
-  unitId String
+  id           String        @id @default(uuid())
+  name         String
+  desc         String?
+  startDate    DateTime
+  endDate      DateTime
+  unitId       String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   renstraMisis RenstraMisi[]
@@ -67,10 +67,12 @@ model Indicator {
   target String
   satuan String
 
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  tujuanIndicators  TujuanIndicator[]
-  programIndicators ProgramIndicator[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  tujuanIndicators      TujuanIndicator[]
+  programIndicators     ProgramIndicator[]
+  kegiatanIndicators    KegiatanIndicator[]
+  subKegiatanIndicators SubKegiatanIndicator[]
 }
 
 model Tujuan {
@@ -96,6 +98,32 @@ model Program {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   programIndicators ProgramIndicator[]
+  kegiatans         Kegiatan[]
+}
+
+model Kegiatan {
+  id            String  @id @default(uuid())
+  name          String
+  totalAnggaran Float
+  programId     String
+  program       Program @relation(fields: [programId], references: [id])
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  kegiatanIndicators KegiatanIndicator[]
+  subKegiatans       SubKegiatan[]
+}
+
+model SubKegiatan {
+  id            String   @id @default(uuid())
+  name          String
+  totalAnggaran Float
+  kegiatanId    String
+  kegiatan      Kegiatan @relation(fields: [kegiatanId], references: [id])
+
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  subKegiatanIndicators SubKegiatanIndicator[]
 }
 
 model TujuanIndicator {
@@ -117,6 +145,30 @@ model ProgramIndicator {
 
   program   Program   @relation(fields: [programId], references: [id])
   indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model KegiatanIndicator {
+  id          String @id @default(uuid())
+  kegiatanId  String
+  indicatorId String
+
+  kegiatan  Kegiatan  @relation(fields: [kegiatanId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SubKegiatanIndicator {
+  id            String @id @default(uuid())
+  subKegiatanId String
+  indicatorId   String
+
+  subKegiatan SubKegiatan @relation(fields: [subKegiatanId], references: [id])
+  indicator   Indicator   @relation(fields: [indicatorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
