@@ -1,0 +1,436 @@
+{
+  "info": {
+    "_postman_id": "0f523700-a4d3-4958-95e4-5fd0e4a3e0f9",
+    "name": "ekin-backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15769200"
+  },
+  "item": [
+    {
+      "name": "VISI",
+      "item": [
+        {
+          "name": "GET ALL VISI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/visi?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET VISI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi",
+                "{{VISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE VISI",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"visi\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/visi",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE VISI",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"visi-update\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi",
+                "{{VISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE VISI",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi",
+                "{{VISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MISI",
+      "item": [
+        {
+          "name": "GET ALL MISI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/visi?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET MISI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/misi/{{MISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "misi",
+                "{{MISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE MISI",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"visi\",\r\n    \"desc\": \"testvisi\",\r\n    \"visiId\": \"{{VISI_ID}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/misi",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "misi"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE MISI",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"visi-update\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi",
+                "{{VISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE MISI",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "visi",
+                "{{VISI_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+    ,
+    {
+      "name": "TUJUAN",
+      "item": [
+        {
+          "name": "GET ALL TUJUAN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET TUJUAN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE TUJUAN",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"tujuan\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"indicators\": [\r\n      {\r\n        \"name\": \"Indikator 1\",\r\n        \"target\": \"100\",\r\n        \"satuan\": \"unit\"\r\n      }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE TUJUAN",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"tujuan-update\",\r\n    \"indicators\": [\r\n      {\r\n        \"name\": \"Indikator Baru\",\r\n        \"target\": \"200\",\r\n        \"satuan\": \"unit\"\r\n      }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE TUJUAN",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": ""
+    },
+    {
+      "key": "VISI_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "MISI_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "TUJUAN_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "RENSTRA_ID",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

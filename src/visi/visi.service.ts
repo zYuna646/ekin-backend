@@ -7,14 +7,14 @@ import {
 import { CreateVisiDto } from './dto/create-visi.dto';
 import { UpdateVisiDto } from './dto/update-visi.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { IVisi } from './interface/visi.interface';
+import { IVisi, IVisiService } from './interface/visi.interface';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { StatusApi } from 'src/common/enum/status.enum';
 import { FiltersVisiDto } from './dto/filters-visi.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class VisiService {
+export class VisiService implements IVisiService {
   private readonly logger = new Logger(VisiService.name);
   constructor(private prisma: PrismaService) {}
 

@@ -7,14 +7,14 @@ import {
 import { CreateMisiDto } from './dto/create-misi.dto';
 import { UpdateMisiDto } from './dto/update-misi.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { IMisi } from './interface/misi.interface';
+import { IMisi, IMisiService } from './interface/misi.interface';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { StatusApi } from 'src/common/enum/status.enum';
 import { FiltersMisiDto } from './dto/filters-misi.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class MisiService {
+export class MisiService implements IMisiService {
   private readonly logger = new Logger(MisiService.name);
   constructor(private prisma: PrismaService) {}
 
