@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProgramModule } from './program/program.module';
 import { KegiatanModule } from './kegiatan/kegiatan.module';
 import { SubKegiatanModule } from './sub-kegiatan/sub-kegiatan.module';
+import { IdasnModule } from './idasn/idasn.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SubKegiatanModule } from './sub-kegiatan/sub-kegiatan.module';
     ProgramModule,
     KegiatanModule,
     SubKegiatanModule,
+    IdasnModule,
   ],
   controllers: [AppController],
   providers: [AppService],
