@@ -6,13 +6,18 @@ import * as jwt from 'jsonwebtoken';
 import jwksClient, { SigningKey } from 'jwks-rsa';
 import { IDASN_ENDPOINTS } from 'src/common/const/idasn.const';
 import { JwtPayload } from '../interface/auth.interface';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ROLES } from 'src/common/const/role.const';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private readonly logger = new Logger(JwtStrategy.name);
   private client: ReturnType<typeof jwksClient>;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -92,9 +97,82 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload): Promise<any> {
-    return {
+    const user = {
       userId: payload.sub,
       ...payload.mapData,
     };
+
+    // Check JPT and UMPEG roles
+    if (user.nipBaru) {
+      try {
+        const roles = user.roles || [];
+        const jptUnitIds: string[] = [];
+        const umpegUnitIds: string[] = [];
+
+        // Always add ASN as default role
+        if (!roles.includes(ROLES.ASN)) {
+          roles.push(ROLES.ASN);
+        }
+
+        // Check JPT - find all records where nip array contains user.nipBaru
+        const jptRecords = await this.prisma.jpt.findMany({
+          where: {
+            nip: {
+              has: user.nipBaru,
+            },
+          },
+        });
+
+        if (jptRecords.length > 0) {
+          if (!roles.includes(ROLES.JPT)) {
+            roles.push(ROLES.JPT);
+          }
+          jptUnitIds.push(...jptRecords.map((record) => record.unitId));
+          this.logger.debug(
+            `User ${user.nipBaru} found in JPT with unitIds: ${jptUnitIds.join(', ')}`,
+          );
+        }
+
+        // Check UMPEG - find all records where nip array contains user.nipBaru
+        const umpegRecords = await this.prisma.umpeg.findMany({
+          where: {
+            nip: {
+              has: user.nipBaru,
+            },
+          },
+        });
+
+        if (umpegRecords.length > 0) {
+          if (!roles.includes(ROLES.UMPEG)) {
+            roles.push(ROLES.UMPEG);
+          }
+          umpegUnitIds.push(...umpegRecords.map((record) => record.unitId));
+          this.logger.debug(
+            `User ${user.nipBaru} found in UMPEG with unitIds: ${umpegUnitIds.join(', ')}`,
+          );
+        }
+
+        user.roles = roles;
+        if (jptUnitIds.length > 0) {
+          user.jpt = jptUnitIds;
+        }
+        if (umpegUnitIds.length > 0) {
+          user.umpeg = umpegUnitIds;
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error checking JPT/UMPEG roles: ${error instanceof Error ? error.message : error}`,
+        );
+      }
+    } else {
+      // Add ASN role as default
+      if (!user.roles || user.roles.length === 0) {
+        user.roles = [ROLES.ASN];
+      } else if (!user.roles.includes(ROLES.ASN)) {
+        user.roles.push(ROLES.ASN);
+      }
+    }
+
+    return user;
   }
 }

@@ -29,6 +29,9 @@ export interface IIdasnVerifyResponse {
     nama: string;
   };
   foto: string;
+  roles: string[];
+  umpeg?: string[];
+  jpt?: string[];
 }
 
 export interface JwtPayload {
