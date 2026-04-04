@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProgramService } from './program.service';
 import { CreateProgramDto } from './dto/create-program.dto';
@@ -14,7 +15,9 @@ import { UpdateProgramDto } from './dto/update-program.dto';
 import { FiltersProgramDto } from './dto/filters-program.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { IProgram } from './interface/program.interface';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
+@UseGuards(JwtGuard)
 @Controller('program')
 export class ProgramController {
   constructor(private readonly programService: ProgramService) {}

@@ -51,13 +51,14 @@ export class RenstraService {
     createRenstraDto: CreateRenstraDto,
   ): Promise<IApiResponse<IRenstra> | null> {
     try {
+      const { misiIds, ...renstraData } = createRenstraDto;
       const data: RenstraWithMisis = await this.prisma.renstra.create({
         data: {
-          ...createRenstraDto,
+          ...renstraData,
           renstraMisis: {
             createMany: {
               data:
-                createRenstraDto.misiIds?.map((misiId) => ({
+                misiIds?.map((misiId) => ({
                   misiId,
                 })) ?? [],
             },
@@ -175,17 +176,18 @@ export class RenstraService {
   ): Promise<IApiResponse<IRenstra> | null> {
     try {
       await this.checkData(id);
+      const { misiIds, ...renstraData } = updateRenstraDto;
       const data: RenstraWithMisis = await this.prisma.renstra.update({
         where: { id },
         data: {
-          ...updateRenstraDto,
-          renstraMisis: updateRenstraDto.misiIds
+          ...renstraData,
+          renstraMisis: misiIds
             ? {
                 deleteMany: {
                   renstraId: id,
                 },
                 createMany: {
-                  data: updateRenstraDto.misiIds.map((misiId) => ({
+                  data: misiIds.map((misiId) => ({
                     misiId,
                   })),
                 },
@@ -214,7 +216,7 @@ export class RenstraService {
         message: 'Renstra updated successfully',
       };
     } catch (error) {
-      this.logger.error(`Failed to update renstra with id ${id}`, error);
+      this.logger.error('Failed to update renstra', error);
       throw error;
     }
   }

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { VisiService } from './visi.service';
 import { CreateVisiDto } from './dto/create-visi.dto';
@@ -14,7 +15,9 @@ import { UpdateVisiDto } from './dto/update-visi.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { IVisi } from './interface/visi.interface';
 import { FiltersVisiDto } from './dto/filters-visi.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
+@UseGuards(JwtGuard)
 @Controller('visi')
 export class VisiController {
   constructor(private readonly visiService: VisiService) {}

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MisiService } from './misi.service';
 import { CreateMisiDto } from './dto/create-misi.dto';
@@ -14,7 +15,9 @@ import { UpdateMisiDto } from './dto/update-misi.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { IMisi } from './interface/misi.interface';
 import { FiltersMisiDto } from './dto/filters-misi.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
+@UseGuards(JwtGuard)
 @Controller('misi')
 export class MisiController {
   constructor(private readonly misiService: MisiService) {}

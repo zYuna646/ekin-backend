@@ -11,6 +11,7 @@ import { ProgramModule } from './program/program.module';
 import { KegiatanModule } from './kegiatan/kegiatan.module';
 import { SubKegiatanModule } from './sub-kegiatan/sub-kegiatan.module';
 import { IdasnModule } from './idasn/idasn.module';
+import { RktModule } from './rkt/rkt.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { IdasnModule } from './idasn/idasn.module';
     KegiatanModule,
     SubKegiatanModule,
     IdasnModule,
+    RktModule,
   ],
   controllers: [AppController],
   providers: [AppService],

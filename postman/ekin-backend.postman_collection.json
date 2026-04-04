@@ -12,6 +12,16 @@
         {
           "name": "GET ALL VISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -43,6 +53,16 @@
         {
           "name": "GET VISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -61,11 +81,21 @@
         {
           "name": "CREATE VISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"visi\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Visi Organisasi\",\r\n    \"desc\": \"Deskripsi visi organisasi\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -87,11 +117,21 @@
         {
           "name": "UPDATE VISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"visi-update\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Visi Organisasi Updated\",\r\n    \"desc\": \"Deskripsi visi organisasi yang diperbarui\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -114,6 +154,16 @@
         {
           "name": "DELETE VISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -137,15 +187,25 @@
         {
           "name": "GET ALL MISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/visi?search&page=1&perPage=10",
+              "raw": "{{BASE_URL}}/misi?search&page=1&perPage=10",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "visi"
+                "misi"
               ],
               "query": [
                 {
@@ -168,6 +228,16 @@
         {
           "name": "GET MISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -186,11 +256,21 @@
         {
           "name": "CREATE MISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"visi\",\r\n    \"desc\": \"testvisi\",\r\n    \"visiId\": \"{{VISI_ID}}\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Misi Organisasi\",\r\n    \"desc\": \"Deskripsi misi organisasi\",\r\n    \"visiId\": \"{{VISI_ID}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -212,11 +292,21 @@
         {
           "name": "UPDATE MISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"visi-update\",\r\n    \"desc\": \"testvisi\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Misi Organisasi Updated\",\r\n    \"desc\": \"Deskripsi misi organisasi yang diperbarui\",\r\n    \"visiId\": \"{{VISI_ID}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -224,13 +314,13 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "raw": "{{BASE_URL}}/misi/{{MISI_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "visi",
-                "{{VISI_ID}}"
+                "misi",
+                "{{MISI_ID}}"
               ]
             }
           },
@@ -239,39 +329,130 @@
         {
           "name": "DELETE MISI",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/visi/{{VISI_ID}}",
+              "raw": "{{BASE_URL}}/misi/{{MISI_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "visi",
-                "{{VISI_ID}}"
+                "misi",
+                "{{MISI_ID}}"
               ]
             }
           },
           "response": []
         }
       ]
-    }
-    ,
+    },
     {
-      "name": "TUJUAN",
+      "name": "AUTH",
       "item": [
         {
-          "name": "GET ALL TUJUAN",
+          "name": "LOGIN",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\" : \"196710281989021002\",\r\n    \"password\" : \"12345\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{BASE_URL}}/tujuan?search&page=1&perPage=10",
+              "raw": "{{BASE_URL}}/auth/login",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "tujuan"
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "VERIFY",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\" : \"196710281989021002\",\r\n    \"password\" : \"12345\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/verify",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RENSTRA",
+      "item": [
+        {
+          "name": "GET ALL RENSTRA",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/renstra?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "renstra"
               ],
               "query": [
                 {
@@ -292,31 +473,51 @@
           "response": []
         },
         {
-          "name": "GET TUJUAN",
+          "name": "GET RENSTRA",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "raw": "{{BASE_URL}}/renstra/{{RENSTRA_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "tujuan",
-                "{{TUJUAN_ID}}"
+                "renstra",
+                "{{RENSTRA_ID}}"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "CREATE TUJUAN",
+          "name": "CREATE RENSTRA",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"tujuan\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"indicators\": [\r\n      {\r\n        \"name\": \"Indikator 1\",\r\n        \"target\": \"100\",\r\n        \"satuan\": \"unit\"\r\n      }\r\n    ]\r\n}",
+              "raw": "{\r\n    \"name\": \"renstra 2024\",\r\n    \"desc\": \"Rencana Strategis 2024\",\r\n    \"startDate\": \"2024-01-01T00:00:00Z\",\r\n    \"endDate\": \"2024-12-31T23:59:59Z\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"misiIds\": [\"{{MISI_ID}}\"]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -324,25 +525,35 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/tujuan",
+              "raw": "{{BASE_URL}}/renstra",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "tujuan"
+                "renstra"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "UPDATE TUJUAN",
+          "name": "UPDATE RENSTRA",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"tujuan-update\",\r\n    \"indicators\": [\r\n      {\r\n        \"name\": \"Indikator Baru\",\r\n        \"target\": \"200\",\r\n        \"satuan\": \"unit\"\r\n      }\r\n    ]\r\n}",
+              "raw": "{\r\n    \"name\": \"renstra 2024 updated\",\r\n    \"desc\": \"Rencana Strategis 2024 Updated\",\r\n    \"startDate\": \"2024-01-01T00:00:00Z\",\r\n    \"endDate\": \"2024-12-31T23:59:59Z\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"misiIds\": [\"{{MISI_ID}}\"]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -350,45 +561,64 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "raw": "{{BASE_URL}}/renstra/{{RENSTRA_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "tujuan",
-                "{{TUJUAN_ID}}"
+                "renstra",
+                "{{RENSTRA_ID}}"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "DELETE TUJUAN",
+          "name": "DELETE RENSTRA",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "raw": "{{BASE_URL}}/renstra/{{RENSTRA_ID}}",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "tujuan",
-                "{{TUJUAN_ID}}"
+                "renstra",
+                "{{RENSTRA_ID}}"
               ]
             }
           },
           "response": []
         }
       ]
-    }
-    ,
+    },
     {
       "name": "PROGRAM",
       "item": [
         {
           "name": "GET ALL PROGRAM",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -420,6 +650,16 @@
         {
           "name": "GET PROGRAM",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -438,11 +678,21 @@
         {
           "name": "CREATE PROGRAM",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"program\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"totalAnggaran\": 10000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Program A\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 5000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indicator 1\",\r\n            \"target\": \"100\",\r\n            \"satuan\": \"unit\"\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -464,11 +714,21 @@
         {
           "name": "UPDATE PROGRAM",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"program-update\",\r\n    \"unitId\": \"UNIT_002\",\r\n    \"totalAnggaran\": 20000000\r\n}",
+              "raw": "{\r\n    \"name\": \"Program A Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 6000000,\r\n    \"tujuanId\": \"{{TUJUAN_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indicator 1 Updated\",\r\n            \"target\": \"150\",\r\n            \"satuan\": \"unit\"\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -491,6 +751,16 @@
         {
           "name": "DELETE PROGRAM",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -507,14 +777,198 @@
           "response": []
         }
       ]
-    }
-    ,
+    },
+    {
+      "name": "TUJUAN",
+      "item": [
+        {
+          "name": "GET ALL TUJUAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET TUJUAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE TUJUAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Tujuan Strategis\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Tujuan\",\r\n            \"target\": \"80\",\r\n            \"satuan\": \"persen\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE TUJUAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Tujuan Strategis Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Tujuan Updated\",\r\n            \"target\": \"90\",\r\n            \"satuan\": \"persen\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE TUJUAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/tujuan/{{TUJUAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "tujuan",
+                "{{TUJUAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "KEGIATAN",
       "item": [
         {
           "name": "GET ALL KEGIATAN",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -546,6 +1000,16 @@
         {
           "name": "GET KEGIATAN",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -564,11 +1028,21 @@
         {
           "name": "CREATE KEGIATAN",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"kegiatan\",\r\n    \"unitId\": \"UNIT_001\",\r\n    \"totalAnggaran\": 5000000,\r\n    \"programId\": \"{{PROGRAM_ID}}\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Kegiatan A\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 2500000,\r\n    \"programId\": \"{{PROGRAM_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Kegiatan\",\r\n            \"target\": \"50\",\r\n            \"satuan\": \"output\"\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -590,11 +1064,21 @@
         {
           "name": "UPDATE KEGIATAN",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"kegiatan-update\",\r\n    \"unitId\": \"UNIT_002\",\r\n    \"totalAnggaran\": 6000000\r\n}",
+              "raw": "{\r\n    \"name\": \"Kegiatan A Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 3000000,\r\n    \"programId\": \"{{PROGRAM_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Kegiatan Updated\",\r\n            \"target\": \"60\",\r\n            \"satuan\": \"output\"\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -617,6 +1101,16 @@
         {
           "name": "DELETE KEGIATAN",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -627,6 +1121,356 @@
               "path": [
                 "kegiatan",
                 "{{KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SUB-KEGIATAN",
+      "item": [
+        {
+          "name": "GET ALL SUB-KEGIATAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/sub-kegiatan?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "sub-kegiatan"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET SUB-KEGIATAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/sub-kegiatan/{{SUB_KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "sub-kegiatan",
+                "{{SUB_KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE SUB-KEGIATAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Sub Kegiatan A1\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 1200000,\r\n    \"kegiatanId\": \"{{KEGIATAN_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Sub Kegiatan\",\r\n            \"target\": \"25\",\r\n            \"satuan\": \"hasil\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/sub-kegiatan",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "sub-kegiatan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE SUB-KEGIATAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Sub Kegiatan A1 Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 1500000,\r\n    \"kegiatanId\": \"{{KEGIATAN_ID}}\",\r\n    \"indicators\": [\r\n        {\r\n            \"name\": \"Indikator Sub Kegiatan Updated\",\r\n            \"target\": \"30\",\r\n            \"satuan\": \"hasil\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/sub-kegiatan/{{SUB_KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "sub-kegiatan",
+                "{{SUB_KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE SUB-KEGIATAN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/sub-kegiatan/{{SUB_KEGIATAN_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "sub-kegiatan",
+                "{{SUB_KEGIATAN_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RKT",
+      "item": [
+        {
+          "name": "GET ALL RKT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/rkt?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rkt"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET RKT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/rkt/{{RKT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rkt",
+                "{{RKT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE RKT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"RKT 2024\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 10000000,\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"subKegiatan\": [\r\n        \"{{SUB_KEGIATAN_ID}}\"\r\n    ],\r\n    \"input\": [\r\n        {\r\n            \"name\": \"Input Indicator 1\",\r\n            \"target\": \"100\",\r\n            \"satuan\": \"unit\"\r\n        }\r\n    ],\r\n    \"output\": [\r\n        {\r\n            \"name\": \"Output Indicator 1\",\r\n            \"target\": \"80\",\r\n            \"satuan\": \"persen\"\r\n        }\r\n    ],\r\n    \"outcome\": [\r\n        {\r\n            \"name\": \"Outcome Indicator 1\",\r\n            \"target\": \"50\",\r\n            \"satuan\": \"hasil\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/rkt",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rkt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE RKT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"RKT 2024 Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"totalAnggaran\": 12000000,\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"subKegiatan\": [\r\n        \"{{SUB_KEGIATAN_ID}}\"\r\n    ],\r\n    \"input\": [\r\n        {\r\n            \"name\": \"Input Indicator 1 Updated\",\r\n            \"target\": \"150\",\r\n            \"satuan\": \"unit\"\r\n        }\r\n    ],\r\n    \"output\": [\r\n        {\r\n            \"name\": \"Output Indicator 1 Updated\",\r\n            \"target\": \"90\",\r\n            \"satuan\": \"persen\"\r\n        }\r\n    ],\r\n    \"outcome\": [\r\n        {\r\n            \"name\": \"Outcome Indicator 1 Updated\",\r\n            \"target\": \"60\",\r\n            \"satuan\": \"hasil\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/rkt/{{RKT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rkt",
+                "{{RKT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE RKT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/rkt/{{RKT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rkt",
+                "{{RKT_ID}}"
               ]
             }
           },
@@ -665,34 +1509,44 @@
       "value": ""
     },
     {
+      "key": "UNIT_ID",
+      "value": ""
+    },
+    {
       "key": "VISI_ID",
-      "value": "",
-      "type": "default"
+      "value": ""
     },
     {
       "key": "MISI_ID",
-      "value": "",
-      "type": "default"
-    },
-    {
-      "key": "TUJUAN_ID",
-      "value": "",
-      "type": "default"
+      "value": ""
     },
     {
       "key": "RENSTRA_ID",
-      "value": "",
-      "type": "default"
+      "value": ""
     },
     {
       "key": "PROGRAM_ID",
-      "value": "",
-      "type": "default"
+      "value": ""
+    },
+    {
+      "key": "TUJUAN_ID",
+      "value": ""
     },
     {
       "key": "KEGIATAN_ID",
-      "value": "",
-      "type": "default"
+      "value": ""
+    },
+    {
+      "key": "SUB_KEGIATAN_ID",
+      "value": ""
+    },
+    {
+      "key": "RKT_ID",
+      "value": ""
+    },
+    {
+      "key": "TOKEN",
+      "value": ""
     }
   ]
 }

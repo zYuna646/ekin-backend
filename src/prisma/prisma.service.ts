@@ -1,10 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger(PrismaService.name);
   constructor(configService: ConfigService) {
     const connectionString = configService.get<string>('DATABASE_URL');
     const adapter = new PrismaPg({
@@ -17,9 +18,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     await this.$connect()
-      .then(() => console.log('Connected to the database successfully.'))
+      .then(() => this.logger.log('Connected to the database successfully.'))
       .catch((error) => {
-        console.error('Failed to connect to the database:', error);
+        this.logger.error('Failed to connect to the database:', error);
         process.exit(1);
       });
   }

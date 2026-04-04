@@ -47,6 +47,7 @@ model Renstra {
   updatedAt    DateTime      @updatedAt
   renstraMisis RenstraMisi[]
   tujuans      Tujuan[]
+  rkts         Rkt[]
 }
 
 model RenstraMisi {
@@ -73,6 +74,9 @@ model Indicator {
   programIndicators     ProgramIndicator[]
   kegiatanIndicators    KegiatanIndicator[]
   subKegiatanIndicators SubKegiatanIndicator[]
+  rktInputIndicators    RktInputIndicator[]
+  rktOutputIndicators   RktOutputIndicator[]
+  rktOutcomeIndicators  RktOutcomeIndicator[]
 }
 
 model Tujuan {
@@ -127,6 +131,7 @@ model SubKegiatan {
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   subKegiatanIndicators SubKegiatanIndicator[]
+  rktSubKegiatans       RktSubKegiatan[]
 }
 
 model TujuanIndicator {
@@ -172,6 +177,89 @@ model SubKegiatanIndicator {
 
   subKegiatan SubKegiatan @relation(fields: [subKegiatanId], references: [id])
   indicator   Indicator   @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rkt {
+  id              String           @id @default(uuid())
+  name            String
+  unitId          String
+  totalAnggaran   Float
+  renstraId       String
+  renstra         Renstra          @relation(fields: [renstraId], references: [id])
+  rktSubKegiatans RktSubKegiatan[]
+
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  rktInputIndicators   RktInputIndicator[]
+  rktOutputIndicators  RktOutputIndicator[]
+  rktOutcomeIndicators RktOutcomeIndicator[]
+}
+
+model RktSubKegiatan {
+  id            String      @id @default(uuid())
+  subKegiatanId String
+  subKegiatan   SubKegiatan @relation(fields: [subKegiatanId], references: [id])
+  rktId         String
+  rkt           Rkt         @relation(fields: [rktId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RktInputIndicator {
+  id          String @id @default(uuid())
+  rktId       String
+  indicatorId String
+
+  rkt       Rkt       @relation(fields: [rktId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RktOutputIndicator {
+  id          String @id @default(uuid())
+  rktId       String
+  indicatorId String
+
+  rkt       Rkt       @relation(fields: [rktId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RktOutcomeIndicator {
+  id          String @id @default(uuid())
+  rktId       String
+  indicatorId String
+
+  rkt       Rkt       @relation(fields: [rktId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Umpeg {
+  id       String @id @default(uuid())
+  name     String
+  unitId   String
+  nip      String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Jpt {
+  id       String @id @default(uuid())
+  name     String
+  unitId   String
+  nip      String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
