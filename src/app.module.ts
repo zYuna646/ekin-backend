@@ -12,6 +12,8 @@ import { KegiatanModule } from './kegiatan/kegiatan.module';
 import { SubKegiatanModule } from './sub-kegiatan/sub-kegiatan.module';
 import { IdasnModule } from './idasn/idasn.module';
 import { RktModule } from './rkt/rkt.module';
+import { UmpegModule } from './umpeg/umpeg.module';
+import { JptModule } from './jpt/jpt.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { RktModule } from './rkt/rkt.module';
     SubKegiatanModule,
     IdasnModule,
     RktModule,
+    UmpegModule,
+    JptModule,
   ],
   controllers: [AppController],
   providers: [AppService],

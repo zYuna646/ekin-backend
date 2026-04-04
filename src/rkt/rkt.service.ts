@@ -43,14 +43,10 @@ export class RktService implements IRktService {
       } = data as any;
       const res: IRkt = {
         ...rkt,
-        subKegiatan:
-          rktSubKegiatans?.map((rsk: any) => rsk.subKegiatan) ?? [],
-        input:
-          rktInputIndicators?.map((ri: any) => ri.indicator) ?? [],
-        output:
-          rktOutputIndicators?.map((ro: any) => ro.indicator) ?? [],
-        outcome:
-          rktOutcomeIndicators?.map((roc: any) => roc.indicator) ?? [],
+        subKegiatan: rktSubKegiatans?.map((rsk: any) => rsk.subKegiatan) ?? [],
+        input: rktInputIndicators?.map((ri: any) => ri.indicator) ?? [],
+        output: rktOutputIndicators?.map((ro: any) => ro.indicator) ?? [],
+        outcome: rktOutcomeIndicators?.map((roc: any) => roc.indicator) ?? [],
       };
       return res;
     } catch (error) {
@@ -61,13 +57,7 @@ export class RktService implements IRktService {
 
   async create(createRktDto: CreateRktDto): Promise<IApiResponse<IRkt> | null> {
     try {
-      const {
-        subKegiatan,
-        input,
-        output,
-        outcome,
-        ...rktData
-      } = createRktDto;
+      const { subKegiatan, input, output, outcome, ...rktData } = createRktDto;
 
       const rkt = await this.prisma.rkt.create({
         data: rktData,
@@ -202,12 +192,9 @@ export class RktService implements IRktService {
           ...rkt,
           subKegiatan:
             rktSubKegiatans?.map((rsk: any) => rsk.subKegiatan) ?? [],
-          input:
-            rktInputIndicators?.map((ri: any) => ri.indicator) ?? [],
-          output:
-            rktOutputIndicators?.map((ro: any) => ro.indicator) ?? [],
-          outcome:
-            rktOutcomeIndicators?.map((roc: any) => roc.indicator) ?? [],
+          input: rktInputIndicators?.map((ri: any) => ri.indicator) ?? [],
+          output: rktOutputIndicators?.map((ro: any) => ro.indicator) ?? [],
+          outcome: rktOutcomeIndicators?.map((roc: any) => roc.indicator) ?? [],
         };
       });
 
@@ -250,13 +237,8 @@ export class RktService implements IRktService {
   ): Promise<IApiResponse<IRkt> | null> {
     try {
       await this.checkData(id);
-      const {
-        subKegiatan,
-        input,
-        output,
-        outcome,
-        ...updateData
-      } = updateRktDto;
+      const { subKegiatan, input, output, outcome, ...updateData } =
+        updateRktDto;
 
       await this.prisma.rkt.update({
         where: { id },

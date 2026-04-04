@@ -1477,6 +1477,364 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "UMPEG",
+      "item": [
+        {
+          "name": "GET ALL UMPEG",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/umpeg?search&unitId&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "umpeg"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "unitId",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET UMPEG",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/umpeg/{{UMPEG_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "umpeg",
+                "{{UMPEG_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE UMPEG",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"UMPEG Name\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"nip\": [\r\n        \"123456789\",\r\n        \"987654321\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/umpeg",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "umpeg"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE UMPEG",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"UMPEG Name Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"nip\": [\r\n        \"123456789\",\r\n        \"987654321\",\r\n        \"111111111\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/umpeg/{{UMPEG_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "umpeg",
+                "{{UMPEG_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE UMPEG",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/umpeg/{{UMPEG_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "umpeg",
+                "{{UMPEG_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "JPT",
+      "item": [
+        {
+          "name": "GET ALL JPT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jpt?search&unitId&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jpt"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "unitId",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET JPT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jpt/{{JPT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jpt",
+                "{{JPT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE JPT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"JPT Name\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"nip\": [\r\n        \"123456789\",\r\n        \"987654321\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jpt",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jpt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE JPT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"JPT Name Updated\",\r\n    \"unitId\": \"{{UNIT_ID}}\",\r\n    \"nip\": [\r\n        \"123456789\",\r\n        \"987654321\",\r\n        \"111111111\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/jpt/{{JPT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jpt",
+                "{{JPT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE JPT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/jpt/{{JPT_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "jpt",
+                "{{JPT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -1504,6 +1862,10 @@
     }
   ],
   "variable": [
+    {
+      "key": "TOKEN",
+      "value": ""
+    },
     {
       "key": "BASE_URL",
       "value": ""
@@ -1545,7 +1907,11 @@
       "value": ""
     },
     {
-      "key": "TOKEN",
+      "key": "UMPEG_ID",
+      "value": ""
+    },
+    {
+      "key": "JPT_ID",
       "value": ""
     }
   ]
