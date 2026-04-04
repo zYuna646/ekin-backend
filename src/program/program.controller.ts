@@ -16,12 +16,16 @@ import { FiltersProgramDto } from './dto/filters-program.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { IProgram } from './interface/program.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { ROLES } from 'src/common/const/role.const';
 
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('program')
 export class ProgramController {
   constructor(private readonly programService: ProgramService) {}
 
+  @Roles(ROLES.ADMIN)
   @Post()
   create(
     @Body() createProgramDto: CreateProgramDto,
@@ -41,6 +45,7 @@ export class ProgramController {
     return this.programService.findOne(id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -49,6 +54,7 @@ export class ProgramController {
     return this.programService.update(id, updateProgramDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<IApiResponse<IProgram> | null> {
     return this.programService.remove(id);

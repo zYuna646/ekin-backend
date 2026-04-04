@@ -16,12 +16,16 @@ import { IApiResponse } from 'src/common/interface/api.interface';
 import { IRkt } from './interface/rkt.interface';
 import { FiltersRktDto } from './dto/filters-rkt.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { ROLES } from 'src/common/const/role.const';
 
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('rkt')
 export class RktController {
   constructor(private readonly rktService: RktService) {}
 
+  @Roles(ROLES.ADMIN)
   @Post()
   create(
     @Body() createRktDto: CreateRktDto,
@@ -41,6 +45,7 @@ export class RktController {
     return this.rktService.findOne(id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -49,6 +54,7 @@ export class RktController {
     return this.rktService.update(id, updateRktDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<IApiResponse<IRkt> | null> {
     return this.rktService.remove(id);

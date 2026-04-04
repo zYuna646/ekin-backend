@@ -16,12 +16,16 @@ import { FiltersJptDto } from './dto/filters-jpt.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { IJpt } from './interface/jpt.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { ROLES } from 'src/common/const/role.const';
 
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('jpt')
-@UseGuards(JwtGuard)
 export class JptController {
   constructor(private readonly jptService: JptService) {}
 
+  @Roles(ROLES.ADMIN)
   @Post()
   create(
     @Body() createJptDto: CreateJptDto,
@@ -41,6 +45,7 @@ export class JptController {
     return this.jptService.findOne(id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -49,6 +54,7 @@ export class JptController {
     return this.jptService.update(id, updateJptDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<IApiResponse<IJpt> | null> {
     return this.jptService.remove(id);
