@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   OWNER_METADATA_KEY,
   OwnerMetadata,
+  ComparisonOperator,
 } from '../decorator/owner.decorator';
 import { ROLES } from 'src/common/const/role.const';
 
@@ -37,7 +38,11 @@ export class OwnerGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (user?.roles?.includes(ROLES.ADMIN)) {
+    // Skip owner check for admin unless excludeAdmin is true
+    if (
+      !ownerMetadata.excludeAdmin &&
+      user?.roles?.includes(ROLES.ADMIN)
+    ) {
       return true;
     }
 
@@ -78,18 +83,61 @@ export class OwnerGuard implements CanActivate {
       );
     }
 
-    if (Array.isArray(ownerValue)) {
-      if (!ownerValue.includes(userValue)) {
-        throw new ForbiddenException('You do not have access to this resource');
-      }
-      return true;
-    }
-
-    if (ownerValue !== userValue) {
+    const operator = (ownerMetadata.operator ?? 'eq') as ComparisonOperator;
+    if (!this.compareValues(ownerValue, userValue, operator)) {
       throw new ForbiddenException('You do not have access to this resource');
     }
 
     return true;
+  }
+
+  private compareValues(
+    ownerValue: any,
+    userValue: any,
+    operator: ComparisonOperator,
+  ): boolean {
+    switch (operator) {
+      case 'eq': {
+        // Equal: ownerValue === userValue (or includes if array)
+        if (Array.isArray(ownerValue)) {
+          return ownerValue.includes(userValue);
+        }
+        return ownerValue === userValue;
+      }
+
+      case 'ne': {
+        // Not equal: ownerValue !== userValue (or not includes if array)
+        if (Array.isArray(ownerValue)) {
+          return !ownerValue.includes(userValue);
+        }
+        return ownerValue !== userValue;
+      }
+
+      case 'in': {
+        // In array: userValue is in ownerValue array
+        if (!Array.isArray(ownerValue)) {
+          throw new BadRequestException(
+            `Operator 'in' requires ownerValue to be an array`,
+          );
+        }
+        return ownerValue.includes(userValue);
+      }
+
+      case 'nin': {
+        // Not in array: userValue is not in ownerValue array
+        if (!Array.isArray(ownerValue)) {
+          throw new BadRequestException(
+            `Operator 'nin' requires ownerValue to be an array`,
+          );
+        }
+        return !ownerValue.includes(userValue);
+      }
+
+      default: {
+        this.logger.error(`Unknown comparison operator: ${operator}`);
+        throw new BadRequestException(`Unknown comparison operator: ${operator}`);
+      }
+    }
   }
 
   private getDelegateName(model: string): string {

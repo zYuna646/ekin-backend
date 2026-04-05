@@ -9,4 +9,34 @@ export const MODEL_LIST = {
   SKP_INDICATOR: 'SkpIndicator',
   SKP_CASCADING: 'SkpCascading',
   SKP_APPROACH: 'SkpApproach',
-};
+  KEGIATAN: 'Kegiatan',
+  SUB_KEGIATAN: 'SubKegiatan',
+  TUJUAN: 'Tujuan',
+  PROGRAM: 'Program',
+} as const;
+
+export const OWNER_FIELD_LIST = {
+  SKP_OWNER: 'nip',
+  RKT_OWNER: 'unitId',
+  RENSTRA_OWNER: 'unitId',
+  KEGIATAN_OWNER: 'unitId',
+  SUB_KEGIATAN_OWNER: 'unitId',
+  TUJUAN_OWNER: 'unitId',
+  PROGRAM_OWNER: 'unitId',
+} as const;
+
+export const COMPARISON_OPERATOR = {
+  EQUAL: 'eq',
+  NOT_EQUAL: 'ne',
+  IN_ARRAY: 'in',
+  NOT_IN_ARRAY: 'nin',
+} as const;
+
+export const COMPARISION_USER_FIELD_LIST = {
+  NIP: 'nipBaru',
+  NAMA: 'nama',
+  NIK: 'nik',
+  ROLES: 'roles',
+  UMPEG: 'umpeg',
+  JPT: 'jpt',
+} as const;

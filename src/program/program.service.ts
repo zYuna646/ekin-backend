@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -12,11 +13,24 @@ import { IProgram, IProgramService } from './interface/program.interface';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { FiltersProgramDto } from './dto/filters-program.dto';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class ProgramService implements IProgramService {
   private readonly logger = new Logger(ProgramService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
+    }
+  }
 
   async checkData(id: string): Promise<IProgram> {
     try {
@@ -50,6 +64,12 @@ export class ProgramService implements IProgramService {
   ): Promise<IApiResponse<IProgram> | null> {
     try {
       const { indicators, ...programData } = createProgramDto;
+
+      // Validate unitId
+      if (programData.unitId) {
+        await this.validateUnitId(programData.unitId);
+      }
+
       const program = await this.prisma.program.create({
         data: programData,
       });
@@ -106,10 +126,10 @@ export class ProgramService implements IProgramService {
     filters: FiltersProgramDto,
   ): Promise<IApiResponse<IProgram[]> | null> {
     try {
-      const { search, unitId, tujuanId, page = 1, perPage = 10 } = filters;
+      const { search, unitIds, tujuanId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
-        ...(unitId && { unitId }),
+        ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(tujuanId && { tujuanId }),
         ...(search && {
           OR: [
@@ -179,6 +199,12 @@ export class ProgramService implements IProgramService {
     try {
       await this.checkData(id);
       const { indicators, ...updateData } = updateProgramDto;
+
+      // Validate unitId if being updated
+      if (updateData.unitId) {
+        await this.validateUnitId(updateData.unitId);
+      }
+
       await this.prisma.program.update({
         where: { id },
         data: updateData,

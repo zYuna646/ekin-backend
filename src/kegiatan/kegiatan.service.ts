@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -12,11 +13,24 @@ import { IKegiatan, IKegiatanService } from './interface/kegiatan.interface';
 import { CreateKegiatanDto } from './dto/create-kegiatan.dto';
 import { UpdateKegiatanDto } from './dto/update-kegiatan.dto';
 import { FiltersKegiatanDto } from './dto/filters-kegiatan.dto';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class KegiatanService implements IKegiatanService {
   private readonly logger = new Logger(KegiatanService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
+    }
+  }
 
   async checkData(id: string): Promise<IKegiatan> {
     try {
@@ -50,6 +64,12 @@ export class KegiatanService implements IKegiatanService {
   ): Promise<IApiResponse<IKegiatan> | null> {
     try {
       const { indicators, ...kegiatanData } = createKegiatanDto;
+
+      // Validate unitId
+      if (kegiatanData.unitId) {
+        await this.validateUnitId(kegiatanData.unitId);
+      }
+
       const kegiatan = await this.prisma.kegiatan.create({
         data: kegiatanData,
       });
@@ -106,10 +126,10 @@ export class KegiatanService implements IKegiatanService {
     filters: FiltersKegiatanDto,
   ): Promise<IApiResponse<IKegiatan[]> | null> {
     try {
-      const { search, unitId, programId, page = 1, perPage = 10 } = filters;
+      const { search, unitIds, programId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
-        ...(unitId && { unitId }),
+        ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(programId && { programId }),
         ...(search && {
           OR: [
@@ -179,6 +199,12 @@ export class KegiatanService implements IKegiatanService {
     try {
       await this.checkData(id);
       const { indicators, ...updateData } = updateKegiatanDto;
+
+      // Validate unitId if being updated
+      if (updateData.unitId) {
+        await this.validateUnitId(updateData.unitId);
+      }
+
       await this.prisma.kegiatan.update({
         where: { id },
         data: updateData,

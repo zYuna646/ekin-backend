@@ -2,11 +2,15 @@ import { SetMetadata } from '@nestjs/common';
 
 export const OWNER_METADATA_KEY = 'owner';
 
+export type ComparisonOperator = 'eq' | 'ne' | 'in' | 'nin';
+
 export interface OwnerMetadata {
   model: string;
   field: string;
   paramKey?: string;
   userField?: string;
+  operator?: ComparisonOperator;
+  excludeAdmin?: boolean;
 }
 
 export const Owner = (
@@ -19,4 +23,6 @@ export const Owner = (
     field,
     paramKey: options?.paramKey ?? 'id',
     userField: options?.userField ?? 'nipBaru',
+    operator: options?.operator ?? 'eq',
+    excludeAdmin: options?.excludeAdmin ?? false,
   } satisfies OwnerMetadata);

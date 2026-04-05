@@ -3,6 +3,7 @@ import { IdasnService } from './idasn.service';
 import { IdasnController } from './idasn.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
+import { UnorService } from './services/unor.service';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HttpModule } from '@nestjs/axios';
     }),
   ],
   controllers: [IdasnController],
-  providers: [IdasnService],
+  providers: [IdasnService, UnorService],
+  exports: [UnorService],
 })
 export class IdasnModule {}

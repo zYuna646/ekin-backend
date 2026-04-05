@@ -14,11 +14,15 @@ import { StatusApi } from 'src/common/enum/status.enum';
 import { FiltersRktDto } from './dto/filters-rkt.dto';
 import { Prisma } from '@prisma/client';
 import { RKT_LABELS } from 'src/common/const/rkt.const';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class RktService implements IRktService {
   private readonly logger = new Logger(RktService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
 
   private validateBudgetRule(
     totalAnggaran: number,
@@ -37,6 +41,15 @@ export class RktService implements IRktService {
       throw new BadRequestException(
         'totalAnggaran cannot be less than 0 for Kinerja Berbasis Non-Anggaran',
       );
+    }
+  }
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
     }
   }
 
@@ -80,6 +93,11 @@ export class RktService implements IRktService {
   async create(createRktDto: CreateRktDto): Promise<IApiResponse<IRkt> | null> {
     try {
       const { subKegiatan, input, output, outcome, ...rktData } = createRktDto;
+
+      // Validate unitId
+      if (rktData.unitId) {
+        await this.validateUnitId(rktData.unitId);
+      }
 
       this.validateBudgetRule(rktData.totalAnggaran, rktData.label);
 
@@ -172,14 +190,14 @@ export class RktService implements IRktService {
 
   async findAll(filters: FiltersRktDto): Promise<IApiResponse<IRkt[]> | null> {
     try {
-      const { search, renstraId, unitId, page = 1, perPage = 10 } = filters;
+      const { search, renstraId, unitIds, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
         ...(renstraId && {
           renstraId,
         }),
-        ...(unitId && {
-          unitId,
+        ...(unitIds && unitIds.length > 0 && {
+          unitId: { in: unitIds },
         }),
         ...(search && {
           OR: [
@@ -263,6 +281,11 @@ export class RktService implements IRktService {
       const existingRkt = await this.checkData(id);
       const { subKegiatan, input, output, outcome, ...updateData } =
         updateRktDto;
+
+      // Validate unitId if being updated
+      if (updateData.unitId) {
+        await this.validateUnitId(updateData.unitId);
+      }
 
       this.validateBudgetRule(
         updateData.totalAnggaran ?? existingRkt.totalAnggaran,

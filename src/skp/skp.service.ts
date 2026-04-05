@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -17,11 +18,28 @@ import {
   SKP_CASCADING,
   SKP_LAMPIRAN_DEFAULT,
 } from 'src/common/const/skp.const';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class SkpService implements ISkpService {
   private readonly logger = new Logger(SkpService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitIds(unitIds: string[]): Promise<void> {
+    if (!unitIds || unitIds.length === 0) return;
+
+    try {
+      for (const unitId of unitIds) {
+        await this.unorService.getUnorById(unitId);
+      }
+    } catch (error) {
+      this.logger.warn(`Invalid unitId in array`);
+      throw new BadRequestException(`Invalid unitId: one or more unitIds are invalid`);
+    }
+  }
 
   async checkData(id: string): Promise<ISkp> {
     try {
@@ -177,6 +195,11 @@ export class SkpService implements ISkpService {
     try {
       await this.checkData(id);
       const { childSkpIds, ...skpData } = updateSkpDto;
+
+      // Validate unitIds if being updated
+      if (skpData.unitId && skpData.unitId.length > 0) {
+        await this.validateUnitIds(skpData.unitId);
+      }
 
       // Update SKP data
       await this.prisma.skp.update({

@@ -102,7 +102,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       ...payload.mapData,
     };
 
-    // Check JPT and UMPEG roles
+    // Check JPT, UMPEG, and ADMIN roles
     if (user.nipBaru) {
       try {
         const roles = user.roles || [];
@@ -112,6 +112,28 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         // Always add ASN as default role
         if (!roles.includes(ROLES.ASN)) {
           roles.push(ROLES.ASN);
+        }
+
+        // Check ADMIN - fetch from Settings table
+        const adminSettings = await this.prisma.settings.findFirst({
+          where: { key: 'ADMIN_ID' },
+        });
+
+        if (adminSettings) {
+          try {
+            const adminIds = JSON.parse(adminSettings.value) as string[];
+            if (
+              adminIds.includes(user.nipBaru) &&
+              !roles.includes(ROLES.ADMIN)
+            ) {
+              roles.push(ROLES.ADMIN);
+              this.logger.debug(
+                `User ${user.nipBaru} identified as ADMIN from Settings`,
+              );
+            }
+          } catch (parseError) {
+            this.logger.error(`Error parsing ADMIN_ID from Settings: ${parseError}`);
+          }
         }
 
         // Check JPT - find all records where nip array contains user.nipBaru
@@ -161,7 +183,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         }
       } catch (error) {
         this.logger.error(
-          `Error checking JPT/UMPEG roles: ${error instanceof Error ? error.message : error}`,
+          `Error checking ADMIN/JPT/UMPEG roles: ${error instanceof Error ? error.message : error}`,
         );
       }
     } else {

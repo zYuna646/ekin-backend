@@ -11,11 +11,7 @@ export interface IAuthResponse {
 }
 
 export interface IIdasnAuthResponse {
-  success: boolean;
-  message: string;
-  mapData: {
-    redirect_uri: string;
-  };
+  redirect_uri: string;
 }
 
 export interface IIdasnVerifyResponse {

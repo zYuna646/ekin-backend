@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID, IsArray } from 'class-validator';
 
 export class FiltersTujuanDto {
   @IsString()
@@ -17,8 +17,9 @@ export class FiltersTujuanDto {
   perPage?: number;
 
   @IsOptional()
-  @IsString()
-  unitId?: string;
+  @IsArray()
+  @IsString({ each: true })
+  unitIds?: string[];
 
   @IsOptional()
   @IsString()

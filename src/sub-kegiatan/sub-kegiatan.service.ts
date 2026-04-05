@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -15,11 +16,24 @@ import {
 import { CreateSubKegiatanDto } from './dto/create-sub-kegiatan.dto';
 import { UpdateSubKegiatanDto } from './dto/update-sub-kegiatan.dto';
 import { FiltersSubKegiatanDto } from './dto/filters-sub-kegiatan.dto';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class SubKegiatanService implements ISubKegiatanService {
   private readonly logger = new Logger(SubKegiatanService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
+    }
+  }
 
   async checkData(id: string): Promise<ISubKegiatan> {
     try {
@@ -53,6 +67,12 @@ export class SubKegiatanService implements ISubKegiatanService {
   ): Promise<IApiResponse<ISubKegiatan> | null> {
     try {
       const { indicators, ...subData } = createSubKegiatanDto;
+
+      // Validate unitId
+      if (subData.unitId) {
+        await this.validateUnitId(subData.unitId);
+      }
+
       const subKegiatan = await this.prisma.subKegiatan.create({
         data: subData,
       });
@@ -109,10 +129,10 @@ export class SubKegiatanService implements ISubKegiatanService {
     filters: FiltersSubKegiatanDto,
   ): Promise<IApiResponse<ISubKegiatan[]> | null> {
     try {
-      const { search, unitId, kegiatanId, page = 1, perPage = 10 } = filters;
+      const { search, unitIds, kegiatanId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
-        ...(unitId && { unitId }),
+        ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(kegiatanId && { kegiatanId }),
         ...(search && {
           OR: [
@@ -183,6 +203,12 @@ export class SubKegiatanService implements ISubKegiatanService {
     try {
       await this.checkData(id);
       const { indicators, ...updateData } = updateSubKegiatanDto;
+
+      // Validate unitId if being updated
+      if (updateData.unitId) {
+        await this.validateUnitId(updateData.unitId);
+      }
+
       await this.prisma.subKegiatan.update({
         where: { id },
         data: updateData,

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID, IsArray } from 'class-validator';
 
 export class FiltersSubKegiatanDto {
   @IsString()
@@ -7,8 +7,9 @@ export class FiltersSubKegiatanDto {
   search?: string;
 
   @IsOptional()
-  @IsString()
-  unitId?: string;
+  @IsArray()
+  @IsString({ each: true })
+  unitIds?: string[];
 
   @IsOptional()
   @Type(() => Number)

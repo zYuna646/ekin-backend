@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { RktService } from './rkt.service';
 import { CreateRktDto } from './dto/create-rkt.dto';
@@ -19,13 +20,21 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { ROLES } from 'src/common/const/role.const';
+import { Owner } from 'src/auth/decorator/owner.decorator';
+import { OwnerGuard } from 'src/auth/guard/owner.guard';
+import {
+  COMPARISON_OPERATOR,
+  MODEL_LIST,
+  OWNER_FIELD_LIST,
+  COMPARISION_USER_FIELD_LIST,
+} from 'src/common/const/common.const';
 
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('rkt')
 export class RktController {
   constructor(private readonly rktService: RktService) {}
 
-  @Roles(ROLES.ADMIN)
+  @Roles(ROLES.ADMIN, ROLES.UMPEG)
   @Post()
   create(
     @Body() createRktDto: CreateRktDto,
@@ -36,7 +45,16 @@ export class RktController {
   @Get()
   findAll(
     @Query() filters: FiltersRktDto,
+    @Request() req: any,
   ): Promise<IApiResponse<IRkt[]> | null> {
+    // If user has UMPEG role but NOT ADMIN, restrict to user's UMPEG units
+    if (
+      req.user?.roles?.includes(ROLES.UMPEG) &&
+      !req.user?.roles?.includes(ROLES.ADMIN) &&
+      req.user?.umpeg
+    ) {
+      filters.unitIds = req.user.umpeg;
+    }
     return this.rktService.findAll(filters);
   }
 
@@ -45,7 +63,12 @@ export class RktController {
     return this.rktService.findOne(id);
   }
 
-  @Roles(ROLES.ADMIN)
+  @Owner(MODEL_LIST.RKT, OWNER_FIELD_LIST.RKT_OWNER, {
+    operator: COMPARISON_OPERATOR.EQUAL,
+    userField: COMPARISION_USER_FIELD_LIST.UMPEG,
+  })
+  @Roles(ROLES.ADMIN, ROLES.UMPEG)
+  @UseGuards(OwnerGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -54,7 +77,12 @@ export class RktController {
     return this.rktService.update(id, updateRktDto);
   }
 
-  @Roles(ROLES.ADMIN)
+  @Roles(ROLES.ADMIN, ROLES.UMPEG)
+  @Owner(MODEL_LIST.RKT, OWNER_FIELD_LIST.RKT_OWNER, {
+    operator: COMPARISON_OPERATOR.EQUAL,
+    userField: COMPARISION_USER_FIELD_LIST.UMPEG,
+  })
+  @UseGuards(OwnerGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<IApiResponse<IRkt> | null> {
     return this.rktService.remove(id);

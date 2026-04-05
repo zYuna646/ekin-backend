@@ -25,12 +25,13 @@ export class IdasnService {
         endpoint,
         `Fetching data with params: ${JSON.stringify(params)}`,
       );
-      return await firstValueFrom(
-        this.http.get<T>(endpoint, {
+      const response = await firstValueFrom(
+        this.http.get<IIdasnResponse<T>>(endpoint, {
           ...config,
           params,
         }),
       );
+      return response.data;
     } catch (error) {
       this.logError('GET', endpoint, error);
       throw error;
@@ -45,7 +46,10 @@ export class IdasnService {
   ): Promise<IIdasnResponse<T>> {
     try {
       this.logInfo('POST', endpoint, `Posting data: ${JSON.stringify(body)}`);
-      return await firstValueFrom(this.http.post<T>(endpoint, body, config));
+      const response = await firstValueFrom(
+        this.http.post<IIdasnResponse<T>>(endpoint, body, config),
+      );
+      return response.data;
     } catch (error) {
       this.logError('POST', endpoint, error);
       throw error;
@@ -60,7 +64,10 @@ export class IdasnService {
   ): Promise<IIdasnResponse<T>> {
     try {
       this.logInfo('PUT', endpoint, `Putting data: ${JSON.stringify(body)}`);
-      return await firstValueFrom(this.http.put<T>(endpoint, body, config));
+      const response = await firstValueFrom(
+        this.http.put<IIdasnResponse<T>>(endpoint, body, config),
+      );
+      return response.data;
     } catch (error) {
       this.logError('PUT', endpoint, error);
       throw error;
@@ -75,7 +82,10 @@ export class IdasnService {
   ): Promise<IIdasnResponse<T>> {
     try {
       this.logInfo('PATCH', endpoint, `Patching data: ${JSON.stringify(body)}`);
-      return await firstValueFrom(this.http.patch<T>(endpoint, body, config));
+      const response = await firstValueFrom(
+        this.http.patch<IIdasnResponse<T>>(endpoint, body, config),
+      );
+      return response.data;
     } catch (error) {
       this.logError('PATCH', endpoint, error);
       throw error;
@@ -94,12 +104,13 @@ export class IdasnService {
         endpoint,
         `Deleting with params: ${JSON.stringify(params)}`,
       );
-      return await firstValueFrom(
-        this.http.delete<T>(endpoint, {
+      const response = await firstValueFrom(
+        this.http.delete<IIdasnResponse<T>>(endpoint, {
           ...config,
           params,
         }),
       );
+      return response.data;
     } catch (error) {
       this.logError('DELETE', endpoint, error);
       throw error;

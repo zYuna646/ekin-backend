@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateRenstraDto } from './dto/create-renstra.dto';
 import { UpdateRenstraDto } from './dto/update-renstra.dto';
@@ -13,11 +14,24 @@ import { StatusApi } from 'src/common/enum/status.enum';
 import { RenstraWithMisis } from './types/renstra.types';
 import { FiltersRenstraDto } from './dto/filters-renstra.dto';
 import { Prisma } from '@prisma/client';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class RenstraService {
   private readonly logger = new Logger(RenstraService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
+    }
+  }
 
   async checkData(id: string): Promise<IRenstra> {
     try {
@@ -52,6 +66,12 @@ export class RenstraService {
   ): Promise<IApiResponse<IRenstra> | null> {
     try {
       const { misiIds, ...renstraData } = createRenstraDto;
+
+      // Validate unitId
+      if (renstraData.unitId) {
+        await this.validateUnitId(renstraData.unitId);
+      }
+
       const data: RenstraWithMisis = await this.prisma.renstra.create({
         data: {
           ...renstraData,
@@ -94,10 +114,10 @@ export class RenstraService {
     filters: FiltersRenstraDto,
   ): Promise<IApiResponse<IRenstra[]> | null> {
     try {
-      const { search, unitId, misiId, page = 1, perPage = 10 } = filters;
+      const { search, unitIds, misiId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
-        ...(unitId && { unitId }),
+        ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(search && {
           name: {
             contains: search,
@@ -177,6 +197,12 @@ export class RenstraService {
     try {
       await this.checkData(id);
       const { misiIds, ...renstraData } = updateRenstraDto;
+
+      // Validate unitId if being updated
+      if (renstraData.unitId) {
+        await this.validateUnitId(renstraData.unitId);
+      }
+
       const data: RenstraWithMisis = await this.prisma.renstra.update({
         where: { id },
         data: {

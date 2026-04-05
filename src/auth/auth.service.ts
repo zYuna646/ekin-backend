@@ -22,14 +22,15 @@ export class AuthService implements IAuthService {
   ) {}
   async login(dto: LoginDto): Promise<IApiResponse<IAuthResponse>> {
     try {
-      const res: IIdasnResponse<IIdasnAuthResponse> = await firstValueFrom(
-        this.http.post<IIdasnAuthResponse>(this.getAuthUrl(), {
+      const response = await firstValueFrom(
+        this.http.post<IIdasnResponse<IIdasnAuthResponse>>(this.getAuthUrl(), {
           username: dto.username,
           password: dto.password,
         }),
       );
+      const res = response.data;
       const data = {
-        token: this.extractAccessToken(res.data.mapData.redirect_uri),
+        token: this.extractAccessToken(res.mapData.redirect_uri),
       };
       return {
         data,

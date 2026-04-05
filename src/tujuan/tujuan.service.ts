@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -12,11 +13,24 @@ import { CreateTujuanDto } from './dto/create-tujuan.dto';
 import { UpdateTujuanDto } from './dto/update-tujuan.dto';
 import { FiltersTujuanDto } from './dto/filters-tujuan.dto';
 import { Prisma } from '@prisma/client';
+import { UnorService } from 'src/idasn/services/unor.service';
 
 @Injectable()
 export class TujuanService implements ITujuanService {
   private readonly logger = new Logger(TujuanService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private unorService: UnorService,
+  ) {}
+
+  private async validateUnitId(unitId: string): Promise<void> {
+    try {
+      await this.unorService.getUnorById(unitId);
+    } catch (error) {
+      this.logger.warn(`Invalid unitId: ${unitId}`);
+      throw new BadRequestException(`Invalid unitId: ${unitId}`);
+    }
+  }
 
   async checkData(id: string): Promise<ITujuan> {
     try {
@@ -52,6 +66,12 @@ export class TujuanService implements ITujuanService {
   ): Promise<IApiResponse<ITujuan> | null> {
     try {
       const { indicators, ...tujuanData } = createTujuanDto;
+
+      // Validate unitId
+      if (tujuanData.unitId) {
+        await this.validateUnitId(tujuanData.unitId);
+      }
+
       const tujuan = await this.prisma.tujuan.create({
         data: tujuanData,
       });
@@ -108,10 +128,10 @@ export class TujuanService implements ITujuanService {
     filters: FiltersTujuanDto,
   ): Promise<IApiResponse<ITujuan[]> | null> {
     try {
-      const { search, unitId, renstraId, page = 1, perPage = 10 } = filters;
+      const { search, unitIds, renstraId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
-        ...(unitId && { unitId }),
+        ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(renstraId && { renstraId }),
         ...(search && {
           name: { contains: search, mode: Prisma.QueryMode.insensitive },
@@ -179,6 +199,12 @@ export class TujuanService implements ITujuanService {
     try {
       await this.checkData(id);
       const { indicators, ...updateData } = updateTujuanDto;
+
+      // Validate unitId if being updated
+      if (updateData.unitId) {
+        await this.validateUnitId(updateData.unitId);
+      }
+
       await this.prisma.tujuan.update({
         where: { id },
         data: updateData,
