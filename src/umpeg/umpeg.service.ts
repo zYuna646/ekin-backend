@@ -38,6 +38,36 @@ export class UmpegService implements IUmpegService {
     createUmpegDto: CreateUmpegDto,
   ): Promise<IApiResponse<IUmpeg> | null> {
     try {
+      // Check if record with same unitId already exists
+      const existingRecord = await this.prisma.umpeg.findFirst({
+        where: { unitId: createUmpegDto.unitId },
+      });
+
+      if (existingRecord) {
+        // Merge and deduplicate NIPs
+        const mergedNips = [
+          ...new Set([...existingRecord.nip, ...createUmpegDto.nip]),
+        ];
+
+        // Update existing record with merged NIPs
+        const data = await this.prisma.umpeg.update({
+          where: { id: existingRecord.id },
+          data: { nip: mergedNips },
+        });
+
+        this.logger.log(
+          `Updated existing Umpeg for unitId ${createUmpegDto.unitId} with merged NIPs`,
+        );
+
+        return {
+          data,
+          code: HttpStatus.OK,
+          status: StatusApi.SUCCESS,
+          message: 'Umpeg updated with new NIPs',
+        };
+      }
+
+      // Create new record if doesn't exist
       const data = await this.prisma.umpeg.create({
         data: createUmpegDto,
       });

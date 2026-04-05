@@ -36,6 +36,36 @@ export class JptService implements IJptService {
 
   async create(createJptDto: CreateJptDto): Promise<IApiResponse<IJpt> | null> {
     try {
+      // Check if record with same unitId already exists
+      const existingRecord = await this.prisma.jpt.findFirst({
+        where: { unitId: createJptDto.unitId },
+      });
+
+      if (existingRecord) {
+        // Merge and deduplicate NIPs
+        const mergedNips = [
+          ...new Set([...existingRecord.nip, ...createJptDto.nip]),
+        ];
+
+        // Update existing record with merged NIPs
+        const data = await this.prisma.jpt.update({
+          where: { id: existingRecord.id },
+          data: { nip: mergedNips },
+        });
+
+        this.logger.log(
+          `Updated existing Jpt for unitId ${createJptDto.unitId} with merged NIPs`,
+        );
+
+        return {
+          data,
+          code: HttpStatus.OK,
+          status: StatusApi.SUCCESS,
+          message: 'Jpt updated with new NIPs',
+        };
+      }
+
+      // Create new record if doesn't exist
       const data = await this.prisma.jpt.create({
         data: createJptDto,
       });
