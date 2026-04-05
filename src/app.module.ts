@@ -14,6 +14,7 @@ import { IdasnModule } from './idasn/idasn.module';
 import { RktModule } from './rkt/rkt.module';
 import { UmpegModule } from './umpeg/umpeg.module';
 import { JptModule } from './jpt/jpt.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { JptModule } from './jpt/jpt.module';
     RktModule,
     UmpegModule,
     JptModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

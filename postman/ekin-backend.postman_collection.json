@@ -1835,6 +1835,152 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "SETTINGS",
+      "item": [
+        {
+          "name": "GET ALL SETTINGS",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/settings?search&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "settings"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET SETTINGS by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/settings/{{SETTINGS_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "settings",
+                "{{SETTINGS_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET SETTINGS by KEY",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/settings/key/DEFAULT_DAY_TIME_START",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "settings",
+                "key",
+                "DEFAULT_DAY_TIME_START"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE SETTINGS",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"value\": \"09:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/settings/{{SETTINGS_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "settings",
+                "{{SETTINGS_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -1912,6 +2058,10 @@
     },
     {
       "key": "JPT_ID",
+      "value": ""
+    },
+    {
+      "key": "SETTINGS_ID",
       "value": ""
     }
   ]
