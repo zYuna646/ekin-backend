@@ -1981,6 +1981,201 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "SKP",
+      "item": [
+        {
+          "name": "GET ALL SKP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/skp?search&renstraId&unitId&page=1&perPage=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "skp"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": null
+                },
+                {
+                  "key": "renstraId",
+                  "value": null
+                },
+                {
+                  "key": "unitId",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET SKP by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/skp/{{SKP_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "skp",
+                "{{SKP_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE SKP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nip\": \"19870101201234567890\",\r\n    \"startDate\": \"2024-01-01\",\r\n    \"endDate\": \"2024-12-31\",\r\n    \"status\": \"DRAFT\",\r\n    \"pendekatan\": \"KUANTITATIF\",\r\n    \"cascading\": \"DIRECT_CASCADING\",\r\n    \"unitId\": [\"unit-1\"],\r\n    \"renstraId\": \"{{RENSTRA_ID}}\",\r\n    \"jabatan\": [{\"name\": \"Kepala Bidang\", \"grade\": \"IV/b\"}]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/skp",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "skp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE SKP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"SUBMITTED\",\r\n    \"cascading\": \"NON_DIRECT_CASCADING\",\r\n    \"childSkpIds\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/skp/{{SKP_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "skp",
+                "{{SKP_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE SKP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/skp/{{SKP_ID}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "skp",
+                "{{SKP_ID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -2062,6 +2257,10 @@
     },
     {
       "key": "SETTINGS_ID",
+      "value": ""
+    },
+    {
+      "key": "SKP_ID",
       "value": ""
     }
   ]

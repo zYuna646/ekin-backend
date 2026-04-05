@@ -48,6 +48,7 @@ model Renstra {
   renstraMisis RenstraMisi[]
   tujuans      Tujuan[]
   rkts         Rkt[]
+  skps         Skp[]
 }
 
 model RenstraMisi {
@@ -188,6 +189,7 @@ model Rkt {
   unitId          String
   totalAnggaran   Float
   renstraId       String
+  label           String?
   renstra         Renstra          @relation(fields: [renstraId], references: [id])
   rktSubKegiatans RktSubKegiatan[]
 
@@ -246,29 +248,78 @@ model RktOutcomeIndicator {
 }
 
 model Umpeg {
-  id       String @id @default(uuid())
-  name     String
-  unitId   String
-  nip      String[]
+  id     String   @id @default(uuid())
+  name   String
+  unitId String
+  nip    String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Jpt {
-  id       String @id @default(uuid())
-  name     String
-  unitId   String
-  nip      String[]
+  id     String   @id @default(uuid())
+  name   String
+  unitId String
+  nip    String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Settings {
-  id      String @id @default(uuid())
-  key      String
-  value    String
+  id    String @id @default(uuid())
+  key   String
+  value String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Skp {
+  id String @id @default(uuid())
+
+  nip        String
+  startDate  DateTime
+  endDate    DateTime
+  status     String
+  pendekatan String
+  cascading  String
+  unitId     String[]
+  jabatan    Json[]
+  renstraId  String
+  renstra    Renstra  @relation(fields: [renstraId], references: [id])
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  skpLampirans SkpLampiran[]
+
+  // Parent-child relationships
+  childSkps  SkpRelation[] @relation("parentSkp")
+  parentSkps SkpRelation[] @relation("childSkp")
+}
+
+model SkpRelation {
+  id       String @id @default(uuid())
+  parentId String
+  childId  String
+
+  parent Skp @relation("parentSkp", fields: [parentId], references: [id], onDelete: Cascade)
+  child  Skp @relation("childSkp", fields: [childId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentId, childId])
+}
+
+model SkpLampiran {
+  id    String   @id @default(uuid())
+  name  String
+  value String[]
+  skpId String
+
+  skp Skp @relation(fields: [skpId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

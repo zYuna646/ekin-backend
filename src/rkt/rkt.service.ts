@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -12,11 +13,32 @@ import { IApiResponse } from 'src/common/interface/api.interface';
 import { StatusApi } from 'src/common/enum/status.enum';
 import { FiltersRktDto } from './dto/filters-rkt.dto';
 import { Prisma } from '@prisma/client';
+import { RKT_LABELS } from 'src/common/const/rkt.const';
 
 @Injectable()
 export class RktService implements IRktService {
   private readonly logger = new Logger(RktService.name);
   constructor(private prisma: PrismaService) {}
+
+  private validateBudgetRule(
+    totalAnggaran: number,
+    label?: string | null,
+  ): void {
+    if (label === RKT_LABELS.KINERJA_BERBASIS_ANGGARAN && totalAnggaran <= 0) {
+      throw new BadRequestException(
+        'totalAnggaran must be greater than 0 for Kinerja Berbasis Anggaran',
+      );
+    }
+
+    if (
+      label === RKT_LABELS.KINERJA_BERBASIS_NON_ANGGARAN &&
+      totalAnggaran < 0
+    ) {
+      throw new BadRequestException(
+        'totalAnggaran cannot be less than 0 for Kinerja Berbasis Non-Anggaran',
+      );
+    }
+  }
 
   async checkData(id: string): Promise<IRkt> {
     try {
@@ -58,6 +80,8 @@ export class RktService implements IRktService {
   async create(createRktDto: CreateRktDto): Promise<IApiResponse<IRkt> | null> {
     try {
       const { subKegiatan, input, output, outcome, ...rktData } = createRktDto;
+
+      this.validateBudgetRule(rktData.totalAnggaran, rktData.label);
 
       const rkt = await this.prisma.rkt.create({
         data: rktData,
@@ -236,9 +260,14 @@ export class RktService implements IRktService {
     updateRktDto: UpdateRktDto,
   ): Promise<IApiResponse<IRkt> | null> {
     try {
-      await this.checkData(id);
+      const existingRkt = await this.checkData(id);
       const { subKegiatan, input, output, outcome, ...updateData } =
         updateRktDto;
+
+      this.validateBudgetRule(
+        updateData.totalAnggaran ?? existingRkt.totalAnggaran,
+        updateData.label ?? existingRkt.label,
+      );
 
       await this.prisma.rkt.update({
         where: { id },

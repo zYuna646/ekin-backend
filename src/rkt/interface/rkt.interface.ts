@@ -7,6 +7,7 @@ export interface IRkt {
   name: string;
   unitId: string;
   totalAnggaran: number;
+  label?: string | null;
   renstraId: string;
   subKegiatan?: ISubKegiatan[];
   input?: IIndicator[];

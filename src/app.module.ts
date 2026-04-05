@@ -15,6 +15,7 @@ import { RktModule } from './rkt/rkt.module';
 import { UmpegModule } from './umpeg/umpeg.module';
 import { JptModule } from './jpt/jpt.module';
 import { SettingsModule } from './settings/settings.module';
+import { SkpModule } from './skp/skp.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SettingsModule } from './settings/settings.module';
     UmpegModule,
     JptModule,
     SettingsModule,
+    SkpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
