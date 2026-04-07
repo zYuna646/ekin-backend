@@ -196,9 +196,10 @@ export class RktService implements IRktService {
         ...(renstraId && {
           renstraId,
         }),
-        ...(unitIds && unitIds.length > 0 && {
-          unitId: { in: unitIds },
-        }),
+        ...(unitIds &&
+          unitIds.length > 0 && {
+            unitId: { in: unitIds },
+          }),
         ...(search && {
           OR: [
             { name: { contains: search, mode: Prisma.QueryMode.insensitive } },

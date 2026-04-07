@@ -4,6 +4,7 @@ import { IdasnController } from './idasn.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { UnorService } from './services/unor.service';
+import { JabatanService } from './services/jabatan.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { UnorService } from './services/unor.service';
     }),
   ],
   controllers: [IdasnController],
-  providers: [IdasnService, UnorService],
-  exports: [UnorService],
+  providers: [IdasnService, UnorService, JabatanService],
+  exports: [UnorService, JabatanService],
 })
 export class IdasnModule {}

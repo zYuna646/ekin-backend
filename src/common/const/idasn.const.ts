@@ -10,5 +10,5 @@ export const IDASN_ENDPOINTS = {
 
   JABATAN: {
     GET_JABATAN_BY_UNOR_ID: (unorId: string) => `/posjab/unor/${unorId}`,
-  }
+  },
 };

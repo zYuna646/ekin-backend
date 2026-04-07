@@ -1,17 +1,35 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, Scope } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
 import { AxiosRequestConfig } from 'axios';
 import { IIdasnResponse } from './interface/idasn.interface';
 import { firstValueFrom } from 'rxjs';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class IdasnService {
   protected readonly baseLogger = new Logger(IdasnService.name);
   constructor(
     private readonly http: HttpService,
     protected readonly configService: ConfigService,
+    @Inject(REQUEST) private request: Request,
   ) {}
+
+  /* ===================== HELPER ===================== */
+  private withAuthToken(config?: AxiosRequestConfig): AxiosRequestConfig {
+    const authHeader = this.request?.headers?.authorization;
+    if (authHeader) {
+      return {
+        ...config,
+        headers: {
+          ...config?.headers,
+          authorization: authHeader,
+        },
+      };
+    }
+    return config || {};
+  }
 
   /* ===================== GET ===================== */
   protected async get<T, P extends object = object>(
@@ -27,7 +45,7 @@ export class IdasnService {
       );
       const response = await firstValueFrom(
         this.http.get<IIdasnResponse<T>>(endpoint, {
-          ...config,
+          ...this.withAuthToken(config),
           params,
         }),
       );
@@ -47,7 +65,11 @@ export class IdasnService {
     try {
       this.logInfo('POST', endpoint, `Posting data: ${JSON.stringify(body)}`);
       const response = await firstValueFrom(
-        this.http.post<IIdasnResponse<T>>(endpoint, body, config),
+        this.http.post<IIdasnResponse<T>>(
+          endpoint,
+          body,
+          this.withAuthToken(config),
+        ),
       );
       return response.data;
     } catch (error) {
@@ -65,7 +87,11 @@ export class IdasnService {
     try {
       this.logInfo('PUT', endpoint, `Putting data: ${JSON.stringify(body)}`);
       const response = await firstValueFrom(
-        this.http.put<IIdasnResponse<T>>(endpoint, body, config),
+        this.http.put<IIdasnResponse<T>>(
+          endpoint,
+          body,
+          this.withAuthToken(config),
+        ),
       );
       return response.data;
     } catch (error) {
@@ -83,7 +109,11 @@ export class IdasnService {
     try {
       this.logInfo('PATCH', endpoint, `Patching data: ${JSON.stringify(body)}`);
       const response = await firstValueFrom(
-        this.http.patch<IIdasnResponse<T>>(endpoint, body, config),
+        this.http.patch<IIdasnResponse<T>>(
+          endpoint,
+          body,
+          this.withAuthToken(config),
+        ),
       );
       return response.data;
     } catch (error) {
@@ -106,7 +136,7 @@ export class IdasnService {
       );
       const response = await firstValueFrom(
         this.http.delete<IIdasnResponse<T>>(endpoint, {
-          ...config,
+          ...this.withAuthToken(config),
           params,
         }),
       );

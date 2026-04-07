@@ -132,7 +132,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
               );
             }
           } catch (parseError) {
-            this.logger.error(`Error parsing ADMIN_ID from Settings: ${parseError}`);
+            this.logger.error(
+              `Error parsing ADMIN_ID from Settings: ${parseError}`,
+            );
           }
         }
 

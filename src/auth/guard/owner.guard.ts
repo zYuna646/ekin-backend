@@ -39,10 +39,7 @@ export class OwnerGuard implements CanActivate {
     const user = request.user;
 
     // Skip owner check for admin unless excludeAdmin is true
-    if (
-      !ownerMetadata.excludeAdmin &&
-      user?.roles?.includes(ROLES.ADMIN)
-    ) {
+    if (!ownerMetadata.excludeAdmin && user?.roles?.includes(ROLES.ADMIN)) {
       return true;
     }
 
@@ -135,7 +132,9 @@ export class OwnerGuard implements CanActivate {
 
       default: {
         this.logger.error(`Unknown comparison operator: ${operator}`);
-        throw new BadRequestException(`Unknown comparison operator: ${operator}`);
+        throw new BadRequestException(
+          `Unknown comparison operator: ${operator}`,
+        );
       }
     }
   }

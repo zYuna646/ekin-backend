@@ -16,6 +16,7 @@ import { UmpegModule } from './umpeg/umpeg.module';
 import { JptModule } from './jpt/jpt.module';
 import { SettingsModule } from './settings/settings.module';
 import { SkpModule } from './skp/skp.module';
+import { UnorModule } from './unor/unor.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SkpModule } from './skp/skp.module';
     JptModule,
     SettingsModule,
     SkpModule,
+    UnorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

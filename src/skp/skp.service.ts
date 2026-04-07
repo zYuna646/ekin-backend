@@ -37,7 +37,9 @@ export class SkpService implements ISkpService {
       }
     } catch (error) {
       this.logger.warn(`Invalid unitId in array`);
-      throw new BadRequestException(`Invalid unitId: one or more unitIds are invalid`);
+      throw new BadRequestException(
+        `Invalid unitId: one or more unitIds are invalid`,
+      );
     }
   }
 
