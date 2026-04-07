@@ -12,7 +12,7 @@ export class UnorService extends IdasnService implements IUnorService {
       const res: IIdasnResponse<IUnor[]> = await this.get(
         IDASN_ENDPOINTS.UNOR.GET_UNORS,
       );
-      const data = res.mapData.find((unor) => unor.id_simpeg === id);
+      const data = res.mapData.find((unor) => unor.id_simpeg == id);
       if (!data) {
         throw new Error(`Unor with id ${id} not found`);
       }

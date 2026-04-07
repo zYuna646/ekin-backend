@@ -13,13 +13,13 @@ import { FilterUnorDto } from './dto/filter-unor.dto';
 export class UnorController {
   constructor(private readonly unorService: UnorService) {}
 
-  @Roles(ROLES.ADMIN, ROLES.JPT)
+  @Roles(ROLES.ADMIN, ROLES.UMPEG)
   @Get()
   getUnor(@Query() filters: FilterUnorDto): Promise<IApiResponse<IUnor[]>> {
     return this.unorService.getUnor(filters);
   }
 
-  @Roles(ROLES.ADMIN, ROLES.JPT)
+  @Roles(ROLES.ADMIN, ROLES.UMPEG)
   @Get(':id')
   getUnorById(@Query('id') id: string): Promise<IApiResponse<IUnor>> {
     return this.unorService.getUnorById(id);
