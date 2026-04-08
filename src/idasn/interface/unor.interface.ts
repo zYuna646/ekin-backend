@@ -2,6 +2,7 @@ import { IAsn, IEselon } from './jabatan.interface';
 
 export interface IUnor {
   id: string;
+  nama: string;
   id_sapk: string;
   id_simpeg: string;
   nama_unor: string;

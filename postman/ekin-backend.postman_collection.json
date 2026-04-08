@@ -1907,6 +1907,35 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "GET UNOR ASN",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/unor/{{UNOR_ID}}/asn",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "unor",
+                "{{UNOR_ID}}",
+                "asn"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
