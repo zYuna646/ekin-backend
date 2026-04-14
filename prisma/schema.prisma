@@ -78,6 +78,7 @@ model Indicator {
   rktInputIndicators    RktInputIndicator[]
   rktOutputIndicators   RktOutputIndicator[]
   rktOutcomeIndicators  RktOutcomeIndicator[]
+  rhkAspekIndicators    RhkAspekIndicator[]
 }
 
 model Tujuan {
@@ -198,6 +199,7 @@ model Rkt {
   rktInputIndicators   RktInputIndicator[]
   rktOutputIndicators  RktOutputIndicator[]
   rktOutcomeIndicators RktOutcomeIndicator[]
+  rhkRkts              RhkRkt[]
 }
 
 model RktSubKegiatan {
@@ -297,6 +299,7 @@ model Skp {
   // Parent-child relationships
   childSkps  SkpRelation[] @relation("parentSkp")
   parentSkps SkpRelation[] @relation("childSkp")
+  rhks       Rhk[]
 }
 
 model SkpRelation {
@@ -320,6 +323,73 @@ model SkpLampiran {
   skpId String
 
   skp Skp @relation(fields: [skpId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rhk {
+  id          String  @id @default(uuid())
+  desc        String
+  klasifikasi String
+  penugasan   String?
+
+  skpId String
+  skp   Skp    @relation(fields: [skpId], references: [id])
+
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  rhkRkts    RhkRkt[]
+  childRhks  RhkRelation[] @relation("parentRhk")
+  parentRhks RhkRelation[] @relation("childRhk")
+  rhkAspeks  RhkAspek[]
+}
+
+model RhkRkt {
+  id String @id @default(uuid())
+
+  rhkId String
+  rhk   Rhk    @relation(fields: [rhkId], references: [id])
+  rktId String
+  rkt   Rkt    @relation(fields: [rktId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RhkRelation {
+  id       String @id @default(uuid())
+  parentId String
+  childId  String
+
+  parent Rhk @relation("parentRhk", fields: [parentId], references: [id], onDelete: Cascade)
+  child  Rhk @relation("childRhk", fields: [childId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentId, childId])
+}
+
+model RhkAspek {
+  id    String  @id @default(uuid())
+  desc  String?
+  jenis String
+
+  rhkId              String
+  rhk                Rhk                 @relation(fields: [rhkId], references: [id])
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  rhkAspekIndicators RhkAspekIndicator[]
+}
+
+model RhkAspekIndicator {
+  id          String @id @default(uuid())
+  rhkAspekId  String
+  indicatorId String
+
+  rhkAspek  RhkAspek  @relation(fields: [rhkAspekId], references: [id])
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

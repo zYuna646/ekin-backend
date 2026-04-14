@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { IUnor, IUnorAsn, IUnorService } from './interface/unor.interface';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { UnorService as IdasnUnorService } from 'src/idasn/services/unor.service';
@@ -10,6 +15,8 @@ import { StatusApi } from 'src/common/enum/status.enum';
 import { FilterUnorDto } from './dto/filter-unor.dto';
 import { JabatanService } from 'src/idasn/services/jabatan.service';
 import { IJabatan, IJenisJabatan } from 'src/idasn/interface/jabatan.interface';
+import { ROLES } from 'src/common/const/role.const';
+
 @Injectable()
 export class UnorService implements IUnorService {
   private readonly logger = new Logger(UnorService.name);
@@ -19,8 +26,28 @@ export class UnorService implements IUnorService {
     private readonly jabatanService: JabatanService,
   ) {}
 
-  async getUnorById(id: string): Promise<IApiResponse<IUnor>> {
+  async getUnorById(
+    id: string,
+    userRoles: string[] = [],
+    userUmpeg: any[] = [],
+    userJpt: any[] = [],
+  ): Promise<IApiResponse<IUnor>> {
     try {
+      // Check authorization for non-admin users
+      if (!userRoles.includes(ROLES.ADMIN)) {
+        const allowedUnits = [
+          ...(userUmpeg?.map((u) => u.toString()) || []),
+          ...(userJpt?.map((u) => u.toString()) || []),
+        ];
+
+        if (!allowedUnits.includes(id?.toString())) {
+          this.logger.warn(
+            `User attempted to access unauthorized UNOR with id ${id}`,
+          );
+          throw new ForbiddenException('You do not have access to this UNOR');
+        }
+      }
+
       const res: IIdasnUnor = await this.idasnUnorService.getUnorById(id);
       const data: IUnor = {
         id: res.id_simpeg,
@@ -38,7 +65,12 @@ export class UnorService implements IUnorService {
       throw error;
     }
   }
-  async getUnor(filters: FilterUnorDto): Promise<IApiResponse<IUnor[]>> {
+  async getUnor(
+    filters: FilterUnorDto,
+    userRoles: string[] = [],
+    userUmpeg: any[] = [],
+    userJpt: any[] = [],
+  ): Promise<IApiResponse<IUnor[]>> {
     try {
       const { search, page = 1, perPage = 10 } = filters;
 
@@ -48,6 +80,18 @@ export class UnorService implements IUnorService {
         id: unor.id_simpeg,
         name: unor.nama_unor,
       }));
+
+      // Filter by user roles and units
+      if (!userRoles.includes(ROLES.ADMIN)) {
+        const allowedUnits = [
+          ...(userUmpeg?.map((u) => u.toString()) || []),
+          ...(userJpt?.map((u) => u.toString()) || []),
+        ];
+
+        data = data.filter((item) =>
+          allowedUnits.includes(item.id?.toString()),
+        );
+      }
 
       if (search) {
         const keyword = search.toLowerCase();
@@ -80,8 +124,26 @@ export class UnorService implements IUnorService {
   async getUnorAsn(
     id: string,
     filters: FilterUnorDto,
+    userRoles: string[] = [],
+    userUmpeg: any[] = [],
+    userJpt: any[] = [],
   ): Promise<IApiResponse<IUnorAsn[]>> {
     try {
+      // Check authorization for non-admin users
+      if (!userRoles.includes(ROLES.ADMIN)) {
+        const allowedUnits = [
+          ...(userUmpeg?.map((u) => u.toString()) || []),
+          ...(userJpt?.map((u) => u.toString()) || []),
+        ];
+
+        if (!allowedUnits.includes(id?.toString())) {
+          this.logger.warn(
+            `User attempted to access unauthorized UNOR ASN with id ${id}`,
+          );
+          throw new ForbiddenException('You do not have access to this UNOR');
+        }
+      }
+
       const { search, page = 1, perPage = 10 } = filters;
       const res: IJabatan[] = await this.jabatanService.getJabatanByUnorId(id);
 

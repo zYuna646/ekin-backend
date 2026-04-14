@@ -12,7 +12,8 @@ import {
 } from '@nestjs/common';
 import { SkpService } from './skp.service';
 import { CreateSkpDto } from './dto/create-skp.dto';
-import { UpdateSkpDto } from './dto/update-skp.dto';
+import { CreateBawahanSkpDto } from './dto/create-bawahan-skp.dto';
+import { UpdateSkpLampiranDto } from './dto/update-skp-lampiran.dto';
 import { SubmitSkpDto } from './dto/submit-skp.dto';
 import { ApproveSkpDto } from './dto/approve-skp.dto';
 import { RejectSkpDto } from './dto/reject-skp.dto';
@@ -43,6 +44,15 @@ export class SkpController {
     return this.skpService.create(createSkpDto, userNip);
   }
 
+  @Roles(ROLES.JPT, ROLES.ASN)
+  @Post(':id/bawahan')
+  createBawahan(
+    @Param('id') parentSkpId: string,
+    @Body() createBawahanSkpDto: CreateBawahanSkpDto,
+  ): Promise<IApiResponse<ISkp> | null> {
+    return this.skpService.createBawahan(parentSkpId, createBawahanSkpDto);
+  }
+
   @Get()
   findAll(
     @Query() filters: FiltersSkpDto,
@@ -67,9 +77,9 @@ export class SkpController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateSkpDto: UpdateSkpDto,
+    @Body() updateSkpLampiranDto: UpdateSkpLampiranDto,
   ): Promise<IApiResponse<ISkp> | null> {
-    return this.skpService.update(id, updateSkpDto);
+    return this.skpService.updateLampirans(id, updateSkpLampiranDto);
   }
 
   @Roles(ROLES.JPT)

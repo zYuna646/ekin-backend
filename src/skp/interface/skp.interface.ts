@@ -27,12 +27,35 @@ export interface ISkp {
 
 export interface ISkpService {
   checkData(id: string, includeStatuses?: boolean): Promise<ISkp>;
-  create(createSkpDto: any, userNip: string): Promise<IApiResponse<ISkp> | null>;
-  findAll(filters: any, userNip?: string, userRoles?: string[]): Promise<IApiResponse<ISkp[]> | null>;
+  create(
+    createSkpDto: any,
+    userNip: string,
+  ): Promise<IApiResponse<ISkp> | null>;
+  createBawahan(
+    parentSkpId: string,
+    createBawahanSkpDto: any,
+  ): Promise<IApiResponse<ISkp> | null>;
+  findAll(
+    filters: any,
+    userNip?: string,
+    userRoles?: string[],
+  ): Promise<IApiResponse<ISkp[]> | null>;
   findOne(id: string): Promise<IApiResponse<ISkp> | null>;
   update(id: string, updateSkpDto: any): Promise<IApiResponse<ISkp> | null>;
+  updateLampirans(
+    id: string,
+    updateSkpLampiranDto: any,
+  ): Promise<IApiResponse<ISkp> | null>;
   remove(id: string, userNip?: string): Promise<IApiResponse<ISkp> | null>;
   submit(id: string, userNip: string): Promise<IApiResponse<ISkp> | null>;
-  approve(id: string, userNip: string, remarks?: string): Promise<IApiResponse<ISkp> | null>;
-  reject(id: string, userNip: string, remarks?: string): Promise<IApiResponse<ISkp> | null>;
+  approve(
+    id: string,
+    userNip: string,
+    remarks?: string,
+  ): Promise<IApiResponse<ISkp> | null>;
+  reject(
+    id: string,
+    userNip: string,
+    remarks?: string,
+  ): Promise<IApiResponse<ISkp> | null>;
 }

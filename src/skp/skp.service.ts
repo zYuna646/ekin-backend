@@ -111,7 +111,7 @@ export class SkpService implements ISkpService {
         cascading: SKP_CASCADING.NOT_YET,
         pendekatan: SKP_APPROACH.KUALITATIF,
         jabatan: [res],
-        unitId: [res.unor.induk?.id_simpeg.toString()],
+        unitId: [createSkpDto.unitId],
         status: SKP_STATUS.DRAFT,
       };
 
@@ -153,6 +153,94 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error('Failed to create skp', error);
+      throw error;
+    }
+  }
+
+  async createBawahan(
+    parentSkpId: string,
+    createBawahanSkpDto: any,
+  ): Promise<IApiResponse<ISkp> | null> {
+    try {
+      // Verify parent SKP exists
+      const parentSkp = await this.checkData(parentSkpId);
+      if (!parentSkp) {
+        throw new NotFoundException(
+          `Parent SKP with id ${parentSkpId} not found`,
+        );
+      }
+
+      const bawahanNip = createBawahanSkpDto.bawahanNip;
+
+      // Get jabatan for the bawahan user
+      const res: IJabatan = await this.jabatanService.getPosJab(bawahanNip);
+      if (!res) {
+        throw new NotFoundException(`Jabatan for NIP ${bawahanNip} not found`);
+      }
+
+      // Convert date strings to Date objects
+      const startDate = new Date(createBawahanSkpDto.startDate);
+      const endDate = new Date(createBawahanSkpDto.endDate);
+
+      const skpData: any = {
+        nip: bawahanNip,
+        startDate,
+        endDate,
+        renstraId: createBawahanSkpDto.renstraId,
+        cascading: SKP_CASCADING.NOT_YET,
+        pendekatan: SKP_APPROACH.KUALITATIF,
+        jabatan: [res],
+        unitId: [res.unor.induk?.id_simpeg.toString()],
+        status: SKP_STATUS.DRAFT,
+      };
+
+      const skp = await this.prisma.$transaction(async (tx) => {
+        // Create new SKP
+        const newSkp = await tx.skp.create({
+          data: skpData,
+        });
+
+        // Create initial status record
+        await tx.status.create({
+          data: {
+            model: MODEL_LIST.SKP,
+            modelId: newSkp.id,
+            value: SKP_STATUS.DRAFT,
+          },
+        });
+
+        // Create parent-child relationship
+        await tx.skpRelation.create({
+          data: {
+            parentId: parentSkpId,
+            childId: newSkp.id,
+          },
+        });
+
+        // Create default lampiran records with empty arrays
+        const lampiranDefaults = Object.values(SKP_LAMPIRAN_DEFAULT);
+        if (lampiranDefaults.length > 0) {
+          await tx.skpLampiran.createMany({
+            data: lampiranDefaults.map((name) => ({
+              name,
+              value: [],
+              skpId: newSkp.id,
+            })),
+          });
+        }
+
+        return newSkp;
+      });
+
+      const result = await this.checkData(skp.id, true);
+      return {
+        data: result,
+        code: HttpStatus.CREATED,
+        status: StatusApi.SUCCESS,
+        message: 'Bawahan SKP created successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to create bawahan skp', error);
       throw error;
     }
   }
@@ -305,6 +393,63 @@ export class SkpService implements ISkpService {
     }
   }
 
+  async updateLampirans(
+    id: string,
+    updateSkpLampiranDto: any,
+  ): Promise<IApiResponse<ISkp> | null> {
+    try {
+      const skp = await this.checkData(id);
+
+      // Update lampirans
+      await this.prisma.$transaction(async (tx) => {
+        const lampiranUpdates = updateSkpLampiranDto.lampirans;
+
+        // Update each lampiran
+        for (const [lampiranName, values] of Object.entries(lampiranUpdates)) {
+          // Find existing lampiran
+          const existingLampiran = await tx.skpLampiran.findFirst({
+            where: {
+              skpId: id,
+              name: lampiranName,
+            },
+          });
+
+          if (existingLampiran) {
+            // Update existing lampiran
+            await tx.skpLampiran.update({
+              where: {
+                id: existingLampiran.id,
+              },
+              data: {
+                value: values as string[],
+              },
+            });
+          } else {
+            // Create new lampiran if it doesn't exist
+            await tx.skpLampiran.create({
+              data: {
+                skpId: id,
+                name: lampiranName,
+                value: values as string[],
+              },
+            });
+          }
+        }
+      });
+
+      const result = await this.checkData(id, true);
+      return {
+        data: result,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'SKP lampirans updated successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to update skp lampirans', error);
+      throw error;
+    }
+  }
+
   async remove(
     id: string,
     userNip?: string,
@@ -312,7 +457,7 @@ export class SkpService implements ISkpService {
     try {
       const data = await this.checkData(id);
 
-      // If userNip is provided, apply atasan authorization and DRAFT status check
+      // If userNip is provided, apply authorization and DRAFT status check
       if (userNip) {
         // Verify status is DRAFT
         if (data.status !== SKP_STATUS.DRAFT) {
@@ -321,28 +466,52 @@ export class SkpService implements ISkpService {
           );
         }
 
-        // Check if current user is atasan by checking if their NIP matches any parent SKP's NIP
-        const isAtasan =
-          data.parentSkps &&
-          data.parentSkps.length > 0 &&
-          data.parentSkps.some((parent) => parent.nip === userNip);
+        // If current user owns the SKP (userNip matches skp.nip), they can delete directly
+        const isOwner = data.nip === userNip;
 
-        if (!isAtasan) {
-          this.logger.warn(
-            `User ${userNip} attempted to delete SKP without atasan authorization`,
-          );
-          throw new ForbiddenException('Only the atasan can delete this SKP');
+        if (!isOwner) {
+          // If not owner, check if current user is atasan
+          const isAtasan =
+            data.parentSkps &&
+            data.parentSkps.length > 0 &&
+            data.parentSkps.some((parent) => parent.nip === userNip);
+
+          if (!isAtasan) {
+            this.logger.warn(
+              `User ${userNip} attempted to delete SKP without authorization (not owner or atasan)`,
+            );
+            throw new ForbiddenException(
+              'Only the SKP owner or atasan can delete this SKP',
+            );
+          }
         }
       }
 
-      // Delete all relationships (parent and child)
-      await this.prisma.skpRelation.deleteMany({
-        where: {
-          OR: [{ parentId: id }, { childId: id }],
-        },
-      });
+      // Delete in transaction to maintain referential integrity
+      await this.prisma.$transaction(async (tx) => {
+        // Delete lampirans first
+        await tx.skpLampiran.deleteMany({
+          where: { skpId: id },
+        });
 
-      await this.prisma.skp.delete({ where: { id } });
+        // Delete all relationships (parent and child)
+        await tx.skpRelation.deleteMany({
+          where: {
+            OR: [{ parentId: id }, { childId: id }],
+          },
+        });
+
+        // Delete statuses
+        await tx.status.deleteMany({
+          where: {
+            modelId: id,
+            model: MODEL_LIST.SKP,
+          },
+        });
+
+        // Delete SKP
+        await tx.skp.delete({ where: { id } });
+      });
       return {
         data,
         code: HttpStatus.OK,
