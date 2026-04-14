@@ -1,5 +1,12 @@
 import { IApiResponse } from 'src/common/interface/api.interface';
 
+export interface ISkpStatus {
+  id: string;
+  value: string;
+  remarks?: string;
+  createdAt: Date;
+}
+
 export interface ISkp {
   id: string;
   nip: string;
@@ -13,15 +20,19 @@ export interface ISkp {
   renstraId: string;
   childSkps?: ISkp[];
   parentSkps?: ISkp[];
+  statuses?: ISkpStatus[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ISkpService {
-  checkData(id: string): Promise<ISkp>;
-  create(createSkpDto: any): Promise<IApiResponse<ISkp> | null>;
-  findAll(filters: any): Promise<IApiResponse<ISkp[]> | null>;
+  checkData(id: string, includeStatuses?: boolean): Promise<ISkp>;
+  create(createSkpDto: any, userNip: string): Promise<IApiResponse<ISkp> | null>;
+  findAll(filters: any, userNip?: string, userRoles?: string[]): Promise<IApiResponse<ISkp[]> | null>;
   findOne(id: string): Promise<IApiResponse<ISkp> | null>;
   update(id: string, updateSkpDto: any): Promise<IApiResponse<ISkp> | null>;
-  remove(id: string): Promise<IApiResponse<ISkp> | null>;
+  remove(id: string, userNip?: string): Promise<IApiResponse<ISkp> | null>;
+  submit(id: string, userNip: string): Promise<IApiResponse<ISkp> | null>;
+  approve(id: string, userNip: string, remarks?: string): Promise<IApiResponse<ISkp> | null>;
+  reject(id: string, userNip: string, remarks?: string): Promise<IApiResponse<ISkp> | null>;
 }

@@ -40,4 +40,17 @@ export class JabatanService extends IdasnService implements IJabatanService {
       throw error;
     }
   }
+
+  async getPosJab(nip: string): Promise<IJabatan> {
+    try {
+      const res: IIdasnResponse<{ data: IJabatan[] }> = await this.get(
+        IDASN_ENDPOINTS.JABATAN.GET_POS_JAB(nip),
+      );
+
+      return res.mapData.data[0];
+    } catch (error) {
+      this.logger.error(`Failed to fetch Pos Jab for NIP ${nip}`, error);
+      throw error;
+    }
+  }
 }

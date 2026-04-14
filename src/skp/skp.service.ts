@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpStatus,
   Injectable,
   Logger,
@@ -17,8 +18,13 @@ import {
   SKP_STATUS,
   SKP_CASCADING,
   SKP_LAMPIRAN_DEFAULT,
+  SKP_APPROACH,
 } from 'src/common/const/skp.const';
 import { UnorService } from 'src/idasn/services/unor.service';
+import { MODEL_LIST } from 'src/common/const/common.const';
+import { ROLES } from 'src/common/const/role.const';
+import { JabatanService } from 'src/idasn/services/jabatan.service';
+import { IJabatan } from 'src/idasn/interface/jabatan.interface';
 
 @Injectable()
 export class SkpService implements ISkpService {
@@ -26,6 +32,7 @@ export class SkpService implements ISkpService {
   constructor(
     private prisma: PrismaService,
     private unorService: UnorService,
+    private readonly jabatanService: JabatanService,
   ) {}
 
   private async validateUnitIds(unitIds: string[]): Promise<void> {
@@ -43,7 +50,7 @@ export class SkpService implements ISkpService {
     }
   }
 
-  async checkData(id: string): Promise<ISkp> {
+  async checkData(id: string, includeStatuses: boolean = false): Promise<ISkp> {
     try {
       const data = await this.prisma.skp.findUnique({
         where: { id },
@@ -62,10 +69,22 @@ export class SkpService implements ISkpService {
         throw new NotFoundException(`Skp with id ${id} not found`);
       }
 
+      let statuses: any[] | undefined;
+      if (includeStatuses) {
+        statuses = await this.prisma.status.findMany({
+          where: {
+            model: MODEL_LIST.SKP,
+            modelId: id,
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+
       const res: ISkp = {
         ...(data as any),
         childSkps: data.childSkps?.map((rel: any) => rel.child) ?? [],
         parentSkps: data.parentSkps?.map((rel: any) => rel.parent) ?? [],
+        ...(includeStatuses && { statuses }),
       };
       return res;
     } catch (error) {
@@ -74,19 +93,40 @@ export class SkpService implements ISkpService {
     }
   }
 
-  async create(createSkpDto: CreateSkpDto): Promise<IApiResponse<ISkp> | null> {
+  async create(
+    createSkpDto: CreateSkpDto,
+    userNip: string,
+  ): Promise<IApiResponse<ISkp> | null> {
     try {
+      const res: IJabatan = await this.jabatanService.getPosJab(userNip);
+      if (!res) {
+        throw new NotFoundException(`Jabatan for NIP ${userNip} not found`);
+      }
+
       const skpData: any = {
-        nip: createSkpDto.nip,
+        nip: userNip,
         startDate: createSkpDto.startDate,
         endDate: createSkpDto.endDate,
-        pendekatan: createSkpDto.pendekatan,
         renstraId: createSkpDto.renstraId,
+        cascading: SKP_CASCADING.NOT_YET,
+        pendekatan: SKP_APPROACH.KUALITATIF,
+        jabatan: [res],
+        unitId: [res.unor.induk?.id_simpeg.toString()],
+        status: SKP_STATUS.DRAFT,
       };
 
       const skp = await this.prisma.$transaction(async (tx) => {
         const newSkp = await tx.skp.create({
           data: skpData,
+        });
+
+        // Create initial status record
+        await tx.status.create({
+          data: {
+            model: MODEL_LIST.SKP,
+            modelId: newSkp.id,
+            value: SKP_STATUS.DRAFT,
+          },
         });
 
         // Create default lampiran records with empty arrays
@@ -104,7 +144,7 @@ export class SkpService implements ISkpService {
         return newSkp;
       });
 
-      const result = await this.checkData(skp.id);
+      const result = await this.checkData(skp.id, true);
       return {
         data: result,
         code: HttpStatus.CREATED,
@@ -117,7 +157,11 @@ export class SkpService implements ISkpService {
     }
   }
 
-  async findAll(filters: FiltersSkpDto): Promise<IApiResponse<ISkp[]> | null> {
+  async findAll(
+    filters: FiltersSkpDto,
+    userNip?: string,
+    userRoles?: string[],
+  ): Promise<IApiResponse<ISkp[]> | null> {
     try {
       const { search, page = 1, perPage = 10, renstraId, unitId } = filters;
       const offset = (page - 1) * perPage;
@@ -134,6 +178,11 @@ export class SkpService implements ISkpService {
           ],
         }),
       };
+
+      // If user is not ADMIN, filter to only their own SKPs
+      if (userNip && userRoles && !userRoles.includes(ROLES.ADMIN)) {
+        where.nip = userNip;
+      }
 
       const [totalItems, data] = await this.prisma.$transaction([
         this.prisma.skp.count({ where }),
@@ -203,22 +252,34 @@ export class SkpService implements ISkpService {
         await this.validateUnitIds(skpData.unitId);
       }
 
-      // Update SKP data
-      await this.prisma.skp.update({
-        where: { id },
-        data: skpData as any,
-      });
-
-      // If childSkpIds provided, update relationships
-      if (childSkpIds !== undefined) {
-        // Delete all existing child relationships
-        await this.prisma.skpRelation.deleteMany({
-          where: { parentId: id },
+      // Update SKP data and create status record if status changed
+      await this.prisma.$transaction(async (tx) => {
+        // Update SKP
+        await tx.skp.update({
+          where: { id },
+          data: skpData as any,
         });
 
-        // Create new relationships
-        if (childSkpIds.length > 0) {
-          await this.prisma.$transaction(async (tx) => {
+        // Create status record if status is updated
+        if (skpData.status) {
+          await tx.status.create({
+            data: {
+              model: MODEL_LIST.SKP,
+              modelId: id,
+              value: skpData.status,
+            },
+          });
+        }
+
+        // If childSkpIds provided, update relationships
+        if (childSkpIds !== undefined) {
+          // Delete all existing child relationships
+          await tx.skpRelation.deleteMany({
+            where: { parentId: id },
+          });
+
+          // Create new relationships
+          if (childSkpIds.length > 0) {
             for (const childSkpId of childSkpIds) {
               await tx.skpRelation.create({
                 data: {
@@ -227,11 +288,11 @@ export class SkpService implements ISkpService {
                 },
               });
             }
-          });
+          }
         }
-      }
+      });
 
-      const result = await this.checkData(id);
+      const result = await this.checkData(id, true);
       return {
         data: result,
         code: HttpStatus.OK,
@@ -244,9 +305,35 @@ export class SkpService implements ISkpService {
     }
   }
 
-  async remove(id: string): Promise<IApiResponse<ISkp> | null> {
+  async remove(
+    id: string,
+    userNip?: string,
+  ): Promise<IApiResponse<ISkp> | null> {
     try {
       const data = await this.checkData(id);
+
+      // If userNip is provided, apply atasan authorization and DRAFT status check
+      if (userNip) {
+        // Verify status is DRAFT
+        if (data.status !== SKP_STATUS.DRAFT) {
+          throw new BadRequestException(
+            'SKP can only be deleted when in DRAFT status',
+          );
+        }
+
+        // Check if current user is atasan by checking if their NIP matches any parent SKP's NIP
+        const isAtasan =
+          data.parentSkps &&
+          data.parentSkps.length > 0 &&
+          data.parentSkps.some((parent) => parent.nip === userNip);
+
+        if (!isAtasan) {
+          this.logger.warn(
+            `User ${userNip} attempted to delete SKP without atasan authorization`,
+          );
+          throw new ForbiddenException('Only the atasan can delete this SKP');
+        }
+      }
 
       // Delete all relationships (parent and child)
       await this.prisma.skpRelation.deleteMany({
@@ -264,6 +351,165 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error('Failed to delete skp', error);
+      throw error;
+    }
+  }
+
+  async submit(
+    id: string,
+    userNip: string,
+  ): Promise<IApiResponse<ISkp> | null> {
+    try {
+      const skp = await this.checkData(id);
+
+      // Verify current status is DRAFT
+      if (skp.status !== SKP_STATUS.DRAFT) {
+        throw new BadRequestException(
+          `SKP can only be submitted from ${SKP_STATUS.DRAFT} status`,
+        );
+      }
+
+      // Update status and create status record
+      await this.prisma.$transaction(async (tx) => {
+        await tx.skp.update({
+          where: { id },
+          data: { status: SKP_STATUS.SUBMITTED },
+        });
+
+        await tx.status.create({
+          data: {
+            model: MODEL_LIST.SKP,
+            modelId: id,
+            value: SKP_STATUS.SUBMITTED,
+          },
+        });
+      });
+
+      const result = await this.checkData(id, true);
+      return {
+        data: result,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Skp submitted successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to submit skp ${id}`, error);
+      throw error;
+    }
+  }
+
+  async approve(
+    id: string,
+    userNip: string,
+    remarks?: string,
+  ): Promise<IApiResponse<ISkp> | null> {
+    try {
+      const skp = await this.checkData(id);
+
+      // Verify current status is SUBMITTED
+      if (skp.status !== SKP_STATUS.SUBMITTED) {
+        throw new BadRequestException(
+          `SKP can only be approved from ${SKP_STATUS.SUBMITTED} status`,
+        );
+      }
+
+      // Check if current user is atasan by checking if their NIP matches any parent SKP's NIP
+      const isAtasan =
+        skp.parentSkps &&
+        skp.parentSkps.length > 0 &&
+        skp.parentSkps.some((parent) => parent.nip === userNip);
+
+      if (!isAtasan) {
+        this.logger.warn(
+          `User ${userNip} attempted to approve SKP without proper authorization`,
+        );
+        throw new ForbiddenException('Only the atasan can approve this SKP');
+      }
+
+      // Update status and create status record
+      await this.prisma.$transaction(async (tx) => {
+        await tx.skp.update({
+          where: { id },
+          data: { status: SKP_STATUS.APROVED },
+        });
+
+        await tx.status.create({
+          data: {
+            model: MODEL_LIST.SKP,
+            modelId: id,
+            value: SKP_STATUS.APROVED,
+            ...(remarks && { remarks }),
+          },
+        });
+      });
+
+      const result = await this.checkData(id, true);
+      return {
+        data: result,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Skp approved successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to approve skp ${id}`, error);
+      throw error;
+    }
+  }
+
+  async reject(
+    id: string,
+    userNip: string,
+    remarks?: string,
+  ): Promise<IApiResponse<ISkp> | null> {
+    try {
+      const skp = await this.checkData(id);
+
+      // Verify current status is SUBMITTED
+      if (skp.status !== SKP_STATUS.SUBMITTED) {
+        throw new BadRequestException(
+          `SKP can only be rejected from ${SKP_STATUS.SUBMITTED} status`,
+        );
+      }
+
+      // Check if current user is atasan by checking if their NIP matches any parent SKP's NIP
+      const isAtasan =
+        skp.parentSkps &&
+        skp.parentSkps.length > 0 &&
+        skp.parentSkps.some((parent) => parent.nip === userNip);
+
+      if (!isAtasan) {
+        this.logger.warn(
+          `User ${userNip} attempted to reject SKP without proper authorization`,
+        );
+        throw new ForbiddenException('Only the atasan can reject this SKP');
+      }
+
+      // Update status and create status record
+      await this.prisma.$transaction(async (tx) => {
+        await tx.skp.update({
+          where: { id },
+          data: { status: SKP_STATUS.REJECTED },
+        });
+
+        await tx.status.create({
+          data: {
+            model: MODEL_LIST.SKP,
+            modelId: id,
+            value: SKP_STATUS.REJECTED,
+            ...(remarks && { remarks }),
+          },
+        });
+      });
+
+      const result = await this.checkData(id, true);
+      return {
+        data: result,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Skp rejected successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to reject skp ${id}`, error);
       throw error;
     }
   }

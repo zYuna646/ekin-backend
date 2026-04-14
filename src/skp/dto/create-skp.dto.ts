@@ -1,16 +1,21 @@
-import { IsString, IsUUID, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsDate,
+} from 'class-validator';
 import { SKP_APPROACH } from 'src/common/const/skp.const';
 
 export class CreateSkpDto {
-  @IsString()
-  nip!: string;
+  @IsDate()
+  startDate: Date;
 
-  @IsDateString()
-  startDate!: string;
+  @IsDate()
+  endDate: Date;
 
-  @IsDateString()
-  endDate!: string;
-
+  @IsOptional()
   @IsEnum(SKP_APPROACH)
   pendekatan!: string;
 
