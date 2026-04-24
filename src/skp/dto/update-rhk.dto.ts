@@ -23,4 +23,3 @@ export class UpdateRhkDto {
   @IsString({ each: true })
   rktIds?: string[];
 }
-

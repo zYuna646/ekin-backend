@@ -17,6 +17,10 @@ export interface IJabatan {
 
 export interface IJabatanService {
   getJabatanByUnorId(unorId: string): Promise<IJabatan[]>;
+  getJabatanByUnorIdWithBawahan(
+    unorId: string,
+    unitId: string,
+  ): Promise<IJabatan[]>;
 }
 
 export interface IJenisJabatan {

@@ -192,9 +192,33 @@ export class SkpService implements ISkpService {
         throw new NotFoundException(`Jabatan for NIP ${bawahanNip} not found`);
       }
 
+      // Check if bawahan SKP already exists for this NIP
+      const existingBawahanSkp = await this.prisma.skp.findFirst({
+        where: {
+          nip: bawahanNip,
+          renstraId: parentSkp.renstraId,
+        },
+      });
+
+      if (existingBawahanSkp) {
+        // Check if relationship already exists
+        const existingRelation = await this.prisma.skpRelation.findFirst({
+          where: {
+            parentId: parentSkpId,
+            childId: existingBawahanSkp.id,
+          },
+        });
+
+        if (existingRelation) {
+          throw new BadRequestException(
+            'Bawahan SKP for this NIP already exists under this parent',
+          );
+        }
+      }
+
       // Convert date strings to Date objects
-      const startDate = new Date(createBawahanSkpDto.startDate);
-      const endDate = new Date(createBawahanSkpDto.endDate);
+      const startDate = parentSkp.startDate;
+      const endDate = parentSkp.endDate;
 
       const skpData: any = {
         nip: bawahanNip,

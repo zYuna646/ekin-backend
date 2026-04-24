@@ -35,6 +35,29 @@ export class UnorController {
   }
 
   @Roles(ROLES.ADMIN, ROLES.UMPEG, ROLES.JPT)
+  @Get(':id/jabatan')
+  getJabatanByUnorWithBawahan(
+    @Param('id') unorId: string,
+    @Request() req: AuthenticatedRequest,
+    @Query('unitId') unitId?: string,
+    @Query() filters: FilterUnorDto = {},
+  ): Promise<IApiResponse<IUnorAsn[]>> {
+    const userRoles = req.user?.roles || [];
+    const userUmpeg = req.user?.umpeg || [];
+    const userJpt = req.user?.jpt || [];
+    const userNip = req.user?.nipBaru || '';
+    return this.unorService.getJabatanByUnorWithBawahan(
+      unorId,
+      unitId,
+      filters,
+      userRoles,
+      userUmpeg,
+      userJpt,
+      userNip,
+    );
+  }
+
+  @Roles(ROLES.ADMIN, ROLES.UMPEG, ROLES.JPT)
   @Get(':id')
   getUnorById(
     @Param('id') id: string,
