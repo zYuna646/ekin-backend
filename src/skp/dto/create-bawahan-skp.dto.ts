@@ -1,9 +1,7 @@
 import {
   IsString,
-  IsUUID,
-  IsDateString,
-  IsEnum,
   IsDate,
+  IsEnum,
 } from 'class-validator';
 import { SKP_APPROACH } from 'src/common/const/skp.const';
 
@@ -19,8 +17,4 @@ export class CreateBawahanSkpDto {
 
   @IsEnum(SKP_APPROACH)
   pendekatan!: string;
-
-  @IsString()
-  @IsUUID(4)
-  renstraId!: string;
 }

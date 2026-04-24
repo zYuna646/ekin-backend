@@ -1,0 +1,11 @@
+export const ASPEK_LABEL = {
+  KUALITAS: 'Kualitas',
+  KUANTITAS: 'Kuantitas',
+  WAKTU: 'Waktu',
+  DESKRIPSI: 'Deskripsi',
+};
+
+export const ASPEK_DEFAULT = {
+  KUALITATIF: [ASPEK_LABEL.DESKRIPSI],
+  KUANTITATIF: [ASPEK_LABEL.KUALITAS, ASPEK_LABEL.KUANTITAS, ASPEK_LABEL.WAKTU],
+};

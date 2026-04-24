@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { CreateSkpDto } from './dto/create-skp.dto';
 import { UpdateSkpDto } from './dto/update-skp.dto';
+import { CreateRhkDto } from './dto/create-rhk.dto';
+import { UpdateRhkDto } from './dto/update-rhk.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ISkp, ISkpService } from './interface/skp.interface';
 import { IApiResponse } from 'src/common/interface/api.interface';
@@ -20,6 +22,7 @@ import {
   SKP_LAMPIRAN_DEFAULT,
   SKP_APPROACH,
 } from 'src/common/const/skp.const';
+import { ASPEK_DEFAULT } from 'src/common/const/aspek.const';
 import { UnorService } from 'src/idasn/services/unor.service';
 import { MODEL_LIST } from 'src/common/const/common.const';
 import { ROLES } from 'src/common/const/role.const';
@@ -62,6 +65,17 @@ export class SkpService implements ISkpService {
           parentSkps: {
             include: { parent: true },
           },
+          rhks: {
+            include: {
+              rhkRkts: {
+                include: {
+                  rkt: true,
+                },
+              },
+              rhkAspeks: true,
+            },
+          },
+          skpLampirans: true,
         },
       });
       if (!data) {
@@ -112,7 +126,7 @@ export class SkpService implements ISkpService {
         pendekatan: SKP_APPROACH.KUALITATIF,
         jabatan: [res],
         unitId: [createSkpDto.unitId],
-        status: SKP_STATUS.DRAFT,
+        status: SKP_STATUS.APROVED,
       };
 
       const skp = await this.prisma.$transaction(async (tx) => {
@@ -125,7 +139,7 @@ export class SkpService implements ISkpService {
           data: {
             model: MODEL_LIST.SKP,
             modelId: newSkp.id,
-            value: SKP_STATUS.DRAFT,
+            value: SKP_STATUS.APROVED,
           },
         });
 
@@ -186,7 +200,7 @@ export class SkpService implements ISkpService {
         nip: bawahanNip,
         startDate,
         endDate,
-        renstraId: createBawahanSkpDto.renstraId,
+        renstraId: parentSkp.renstraId,
         cascading: SKP_CASCADING.NOT_YET,
         pendekatan: SKP_APPROACH.KUALITATIF,
         jabatan: [res],
@@ -314,7 +328,7 @@ export class SkpService implements ISkpService {
 
   async findOne(id: string): Promise<IApiResponse<ISkp> | null> {
     try {
-      const data = await this.checkData(id);
+      const data = await this.checkData(id, true);
       return {
         data,
         code: HttpStatus.OK,
@@ -323,6 +337,111 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error('Failed to retrieve skp', error);
+      throw error;
+    }
+  }
+
+  async findBawahan(
+    parentSkpId: string,
+    filtersSkpDto: FiltersSkpDto,
+  ): Promise<IApiResponse<ISkp[]> | null> {
+    try {
+      // Verify parent SKP exists
+      await this.checkData(parentSkpId);
+
+      const {
+        search,
+        page = 1,
+        perPage = 10,
+        renstraId,
+        unitId,
+      } = filtersSkpDto;
+      const skip = (page - 1) * perPage;
+
+      // Build where condition
+      const whereCondition: any = {
+        parentSkps: {
+          some: {
+            parentId: parentSkpId,
+          },
+        },
+      };
+
+      if (search) {
+        whereCondition.nip = {
+          contains: search,
+          mode: 'insensitive',
+        };
+      }
+
+      if (renstraId) {
+        whereCondition.renstraId = renstraId;
+      }
+
+      if (unitId) {
+        whereCondition.unitId = {
+          has: unitId,
+        };
+      }
+
+      // Get total count
+      const totalItems = await this.prisma.skp.count({
+        where: whereCondition,
+      });
+
+      // Get paginated results
+      const data = await this.prisma.skp.findMany({
+        where: whereCondition,
+        include: {
+          renstra: true,
+          childSkps: {
+            include: { child: true },
+          },
+          parentSkps: {
+            include: { parent: true },
+          },
+          rhks: {
+            include: {
+              rhkRkts: {
+                include: {
+                  rkt: true,
+                },
+              },
+              rhkAspeks: true,
+            },
+          },
+          skpLampirans: true,
+        },
+        skip,
+        take: perPage,
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const mappedData = data.map((skp: any) => ({
+        ...(skp as any),
+        childSkps: skp.childSkps?.map((rel: any) => rel.child) ?? [],
+        parentSkps: skp.parentSkps?.map((rel: any) => rel.parent) ?? [],
+      }));
+
+      const totalPages = Math.ceil(totalItems / perPage);
+
+      return {
+        data: mappedData,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Bawahan SKP retrieved successfully',
+        pagination: {
+          page,
+          perPage,
+          totalItems,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to retrieve bawahan SKP for ${parentSkpId}`,
+        error,
+      );
       throw error;
     }
   }
@@ -455,7 +574,7 @@ export class SkpService implements ISkpService {
     userNip?: string,
   ): Promise<IApiResponse<ISkp> | null> {
     try {
-      const data = await this.checkData(id);
+      const data = await this.checkData(id, true);
 
       // If userNip is provided, apply authorization and DRAFT status check
       if (userNip) {
@@ -679,6 +798,210 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error(`Failed to reject skp ${id}`, error);
+      throw error;
+    }
+  }
+
+  async addRhk(
+    skpId: string,
+    createRhkDto: CreateRhkDto,
+  ): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists and get pendekatan
+      const skp = await this.prisma.skp.findUnique({
+        where: { id: skpId },
+      });
+
+      if (!skp) {
+        throw new NotFoundException(`SKP with id ${skpId} not found`);
+      }
+
+      const newRhk = await this.prisma.$transaction(async (tx) => {
+        // Create RHK
+        const rhk = await tx.rhk.create({
+          data: {
+            desc: createRhkDto.desc,
+            klasifikasi: createRhkDto.klasifikasi,
+            jenis: createRhkDto.jenis,
+            penugasan: createRhkDto.penugasan,
+            skpId,
+          },
+        });
+
+        // Create RhkAspek based on SKP pendekatan
+        const aspeksToCreate = ASPEK_DEFAULT[skp.pendekatan] || [];
+        if (aspeksToCreate.length > 0) {
+          await tx.rhkAspek.createMany({
+            data: aspeksToCreate.map((aspek) => ({
+              jenis: aspek,
+              rhkId: rhk.id,
+            })),
+          });
+        }
+
+        // Create RhkRkt relationships if rktIds provided
+        if (createRhkDto.rktIds && createRhkDto.rktIds.length > 0) {
+          await tx.rhkRkt.createMany({
+            data: createRhkDto.rktIds.map((rktId) => ({
+              rhkId: rhk.id,
+              rktId,
+            })),
+          });
+        }
+
+        // Return RHK with relationships
+        return tx.rhk.findUnique({
+          where: { id: rhk.id },
+          include: {
+            rhkRkts: {
+              include: {
+                rkt: true,
+              },
+            },
+            rhkAspeks: true,
+          },
+        });
+      });
+
+      return {
+        data: newRhk,
+        code: HttpStatus.CREATED,
+        status: StatusApi.SUCCESS,
+        message: 'RHK added to SKP successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to add RHK to SKP ${skpId}`, error);
+      throw error;
+    }
+  }
+
+  async removeRhk(
+    skpId: string,
+    rhkId: string,
+  ): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists
+      await this.checkData(skpId);
+
+      // Verify RHK exists and belongs to the SKP
+      const rhk = await this.prisma.rhk.findUnique({
+        where: { id: rhkId },
+      });
+
+      if (!rhk) {
+        throw new NotFoundException(`RHK with ID ${rhkId} not found`);
+      }
+
+      if (rhk.skpId !== skpId) {
+        throw new BadRequestException('RHK does not belong to this SKP');
+      }
+
+      // Delete in transaction to maintain referential integrity
+      await this.prisma.$transaction(async (tx) => {
+        // Delete RhkRkt relationships first
+        await tx.rhkRkt.deleteMany({
+          where: { rhkId },
+        });
+
+        // Delete the RHK
+        await tx.rhk.delete({
+          where: { id: rhkId },
+        });
+      });
+
+      return {
+        data: rhk,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'RHK removed from SKP successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to remove RHK ${rhkId} from SKP ${skpId}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async updateRhk(
+    skpId: string,
+    rhkId: string,
+    updateRhkDto: UpdateRhkDto,
+  ): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists
+      await this.checkData(skpId);
+
+      // Verify RHK exists and belongs to the SKP
+      const rhk = await this.prisma.rhk.findUnique({
+        where: { id: rhkId },
+      });
+
+      if (!rhk) {
+        throw new NotFoundException(`RHK with ID ${rhkId} not found`);
+      }
+
+      if (rhk.skpId !== skpId) {
+        throw new BadRequestException('RHK does not belong to this SKP');
+      }
+
+      const updatedRhk = await this.prisma.$transaction(async (tx) => {
+        // Update RHK fields
+        const rhkData: any = {};
+        if (updateRhkDto.desc !== undefined) rhkData.desc = updateRhkDto.desc;
+        if (updateRhkDto.klasifikasi !== undefined)
+          rhkData.klasifikasi = updateRhkDto.klasifikasi;
+        if (updateRhkDto.jenis !== undefined)
+          rhkData.jenis = updateRhkDto.jenis;
+        if (updateRhkDto.penugasan !== undefined)
+          rhkData.penugasan = updateRhkDto.penugasan;
+
+        // Update RHK
+        const updated = await tx.rhk.update({
+          where: { id: rhkId },
+          data: rhkData,
+        });
+
+        // Update RhkRkt relationships if rktIds provided
+        if (updateRhkDto.rktIds !== undefined) {
+          // Delete existing RhkRkt relationships
+          await tx.rhkRkt.deleteMany({
+            where: { rhkId },
+          });
+
+          // Create new RhkRkt relationships
+          if (updateRhkDto.rktIds.length > 0) {
+            await tx.rhkRkt.createMany({
+              data: updateRhkDto.rktIds.map((rktId) => ({
+                rhkId,
+                rktId,
+              })),
+            });
+          }
+        }
+
+        // Return updated RHK with relationships
+        return tx.rhk.findUnique({
+          where: { id: rhkId },
+          include: {
+            rhkRkts: {
+              include: {
+                rkt: true,
+              },
+            },
+          },
+        });
+      });
+
+      return {
+        data: updatedRhk,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'RHK updated successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to update RHK ${rhkId} in SKP ${skpId}`, error);
       throw error;
     }
   }

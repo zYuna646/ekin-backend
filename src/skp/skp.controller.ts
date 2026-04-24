@@ -13,6 +13,8 @@ import {
 import { SkpService } from './skp.service';
 import { CreateSkpDto } from './dto/create-skp.dto';
 import { CreateBawahanSkpDto } from './dto/create-bawahan-skp.dto';
+import { CreateRhkDto } from './dto/create-rhk.dto';
+import { UpdateRhkDto } from './dto/update-rhk.dto';
 import { UpdateSkpLampiranDto } from './dto/update-skp-lampiran.dto';
 import { SubmitSkpDto } from './dto/submit-skp.dto';
 import { ApproveSkpDto } from './dto/approve-skp.dto';
@@ -51,6 +53,15 @@ export class SkpController {
     @Body() createBawahanSkpDto: CreateBawahanSkpDto,
   ): Promise<IApiResponse<ISkp> | null> {
     return this.skpService.createBawahan(parentSkpId, createBawahanSkpDto);
+  }
+
+  @Roles(ROLES.JPT, ROLES.ASN)
+  @Get(':id/bawahan')
+  findBawahan(
+    @Param('id') parentSkpId: string,
+    @Query() filters: FiltersSkpDto,
+  ): Promise<IApiResponse<ISkp[]> | null> {
+    return this.skpService.findBawahan(parentSkpId, filters);
   }
 
   @Get()
@@ -124,5 +135,39 @@ export class SkpController {
   ): Promise<IApiResponse<ISkp> | null> {
     const userNip = req.user?.nipBaru;
     return this.skpService.reject(id, userNip, rejectSkpDto.remarks);
+  }
+
+  @Owner(MODEL_LIST.SKP, 'nip')
+  @Roles(ROLES.ASN)
+  @UseGuards(OwnerGuard)
+  @Post(':id/rhk/add')
+  addRhk(
+    @Param('id') skpId: string,
+    @Body() createRhkDto: CreateRhkDto,
+  ): Promise<IApiResponse<any> | null> {
+    return this.skpService.addRhk(skpId, createRhkDto);
+  }
+
+  @Owner(MODEL_LIST.SKP, 'nip')
+  @Roles(ROLES.ASN)
+  @UseGuards(OwnerGuard)
+  @Patch(':id/rhk/:rhkId')
+  updateRhk(
+    @Param('id') skpId: string,
+    @Param('rhkId') rhkId: string,
+    @Body() updateRhkDto: UpdateRhkDto,
+  ): Promise<IApiResponse<any> | null> {
+    return this.skpService.updateRhk(skpId, rhkId, updateRhkDto);
+  }
+
+  @Owner(MODEL_LIST.SKP, 'nip')
+  @Roles(ROLES.ASN)
+  @UseGuards(OwnerGuard)
+  @Delete(':id/rhk/:rhkId')
+  removeRhk(
+    @Param('id') skpId: string,
+    @Param('rhkId') rhkId: string,
+  ): Promise<IApiResponse<any> | null> {
+    return this.skpService.removeRhk(skpId, rhkId);
   }
 }
