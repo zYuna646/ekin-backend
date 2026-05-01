@@ -1,0 +1,22 @@
+services:
+
+  api:
+    env_file:
+      - .env.staging
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_volume:/app/uploads
+
+  postgres:
+    env_file:
+      - .env.staging
+    restart: always
+
+  redis:
+    restart: always
+
+volumes:
+  uploads_volume:
+    driver: local

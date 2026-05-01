@@ -1,0 +1,27 @@
+services:
+
+  api:
+    env_file:
+      - .env.local
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - uploads_volume:/app/uploads
+    command: npm run start:dev
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+volumes:
+  node_modules:
+  uploads_volume:
+    driver: local
