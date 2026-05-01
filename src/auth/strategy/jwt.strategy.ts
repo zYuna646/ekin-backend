@@ -4,10 +4,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
 import jwksClient, { SigningKey } from 'jwks-rsa';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 import { IDASN_ENDPOINTS } from 'src/common/const/idasn.const';
 import { JwtPayload } from '../interface/auth.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ROLES } from 'src/common/const/role.const';
+import { IUnorDetails } from 'src/idasn/interface/unor.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -17,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
+    private httpService: HttpService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -86,7 +90,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
       this.logger.debug(`Token verified successfully for user: ${payload.sub}`);
 
-      const validated = await this.validate(payload);
+      const validated = await this.validate(payload, token);
       this.success(validated);
     } catch (error) {
       this.logger.error(
@@ -96,13 +100,43 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
   }
 
-  async validate(payload: JwtPayload): Promise<any> {
+  private jabatanExistsInHierarchy(
+    jabatanName: string,
+    unorDetails: IUnorDetails,
+  ): boolean {
+    if (!unorDetails) {
+      return false;
+    }
+
+    // Normalize jabatan names for comparison (case-insensitive, trim)
+    const searchName = jabatanName.trim().toUpperCase();
+    const currentName = unorDetails.namaJabatan?.trim().toUpperCase() || '';
+
+
+    // Check if current unit's jabatan matches
+    if (currentName === searchName) {
+      return true;
+    }
+
+    // Recursively check in bawahan
+    if (unorDetails.bawahan && Array.isArray(unorDetails.bawahan)) {
+      for (const bawahan of unorDetails.bawahan) {
+        if (this.jabatanExistsInHierarchy(jabatanName, bawahan)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  async validate(payload: JwtPayload, token: string): Promise<any> {
     const user = {
       userId: payload.sub,
       ...payload.mapData,
     };
 
-    // Check JPT, UMPEG, and ADMIN roles
+    // Check JPT, UMPEG, ADMIN, and PIMPINAN roles
     if (user.nipBaru) {
       try {
         const roles = user.roles || [];
@@ -152,9 +186,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             roles.push(ROLES.JPT);
           }
           jptUnitIds.push(...jptRecords.map((record) => record.unitId));
-          this.logger.debug(
-            `User ${user.nipBaru} found in JPT with unitIds: ${jptUnitIds.join(', ')}`,
-          );
         }
 
         // Check UMPEG - find all records where nip array contains user.nipBaru
@@ -171,9 +202,69 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             roles.push(ROLES.UMPEG);
           }
           umpegUnitIds.push(...umpegRecords.map((record) => record.unitId));
-          this.logger.debug(
-            `User ${user.nipBaru} found in UMPEG with unitIds: ${umpegUnitIds.join(', ')}`,
+        }
+
+        // Check PIMPINAN - check if user's jabatan name exists in the unor hierarchy
+        try {
+          const idasnApiUrl =
+            this.configService.get<string>('IDASN_API_URL') ??
+            'http://localhost:3000/api';
+
+          // Create request config with timeout and authorization header
+          const config = {
+            timeout: 15000, // 15 seconds timeout for PIMPINAN check
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          };
+
+          // Fetch user's current jabatan
+          const jabatanRes = await firstValueFrom(
+            this.httpService.get(
+              `${idasnApiUrl}${IDASN_ENDPOINTS.JABATAN.GET_POS_JAB(user.nipBaru)}`,
+              config,
+            ),
           );
+
+          const jabatanData = jabatanRes.data?.mapData?.data[0];
+          if (jabatanData && jabatanData.nama_jabatan && jabatanData.unor?.id) {
+            // Fetch organization hierarchy
+            const unorRes = await firstValueFrom(
+              this.httpService.get(
+                `${idasnApiUrl}${IDASN_ENDPOINTS.UNOR.GET_UNOR_DETAILS(jabatanData.unor.induk.id)}`,
+                config,
+              ),
+            );
+
+            // Handle mapData - it can be an array, get first element
+            let unorHierarchy = unorRes.data?.mapData;
+            if (Array.isArray(unorHierarchy)) {
+              unorHierarchy = unorHierarchy[0];
+            }
+
+            this.logger.debug(
+              `Fetched unor details for PIMPINAN check: ${JSON.stringify(unorHierarchy)}`,
+            );
+            if (
+              unorHierarchy &&
+              this.jabatanExistsInHierarchy(
+                jabatanData.nama_jabatan,
+                unorHierarchy,
+              )
+            ) {
+              if (!roles.includes(ROLES.PIMPINAN)) {
+                roles.push(ROLES.PIMPINAN);
+                this.logger.debug(
+                  `User ${user.nipBaru} identified as PIMPINAN - jabatan '${jabatanData.nama_jabatan}' found in unor hierarchy`,
+                );
+              }
+            }
+          }
+        } catch (pimpinanError) {
+          this.logger.warn(
+            `Failed to check PIMPINAN role for user ${user.nipBaru}: ${pimpinanError instanceof Error ? pimpinanError.message : pimpinanError}`,
+          );
+          // Don't throw, just log warning - PIMPINAN check is optional
         }
 
         user.roles = roles;
@@ -185,7 +276,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         }
       } catch (error) {
         this.logger.error(
-          `Error checking ADMIN/JPT/UMPEG roles: ${error instanceof Error ? error.message : error}`,
+          `Error checking roles: ${error instanceof Error ? error.message : error}`,
         );
       }
     } else {

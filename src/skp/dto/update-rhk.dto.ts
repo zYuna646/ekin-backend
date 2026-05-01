@@ -22,4 +22,13 @@ export class UpdateRhkDto {
   @IsArray()
   @IsString({ each: true })
   rktIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  parentRhkId?: string; // Optional parent RHK ID (one-to-one parent relationship)
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  childRhkIds?: string[]; // Child RHK IDs (one-to-many children relationship)
 }

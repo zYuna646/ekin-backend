@@ -13,6 +13,7 @@ export const MODEL_LIST = {
   SUB_KEGIATAN: 'SubKegiatan',
   TUJUAN: 'Tujuan',
   PROGRAM: 'Program',
+  PERIODE_PENILAIAN: 'PeriodePenilaian',
 } as const;
 
 export const OWNER_FIELD_LIST = {
@@ -23,6 +24,7 @@ export const OWNER_FIELD_LIST = {
   SUB_KEGIATAN_OWNER: 'unitId',
   TUJUAN_OWNER: 'unitId',
   PROGRAM_OWNER: 'unitId',
+  PERIODE_PENILAIAN_OWNER: 'unitId',
 } as const;
 
 export const COMPARISON_OPERATOR = {

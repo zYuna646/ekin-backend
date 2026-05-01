@@ -78,7 +78,7 @@ export class SkpService implements ISkpService {
           skpLampirans: true,
         },
       });
-      if (!data) {
+      if (!data || data.deletedAt) {
         this.logger.warn(`Skp with id ${id} not found`);
         throw new NotFoundException(`Skp with id ${id} not found`);
       }
@@ -127,6 +127,7 @@ export class SkpService implements ISkpService {
         jabatan: [res],
         unitId: [createSkpDto.unitId],
         status: SKP_STATUS.APROVED,
+        isJPT: true,
       };
 
       const skp = await this.prisma.$transaction(async (tx) => {
@@ -197,6 +198,7 @@ export class SkpService implements ISkpService {
         where: {
           nip: bawahanNip,
           renstraId: parentSkp.renstraId,
+          deletedAt: null,
         },
       });
 
@@ -293,6 +295,7 @@ export class SkpService implements ISkpService {
       const offset = (page - 1) * perPage;
 
       const where: any = {
+        deletedAt: null,
         ...(renstraId && { renstraId }),
         ...(unitId && { unitId: { has: unitId } }),
         ...(search && {
@@ -306,7 +309,7 @@ export class SkpService implements ISkpService {
       };
 
       // If user is not ADMIN, filter to only their own SKPs
-      if (userNip && userRoles && !userRoles.includes(ROLES.ADMIN)) {
+      if (userNip && userRoles) {
         where.nip = userNip;
       }
 
@@ -384,6 +387,7 @@ export class SkpService implements ISkpService {
 
       // Build where condition
       const whereCondition: any = {
+        deletedAt: null,
         parentSkps: {
           some: {
             parentId: parentSkpId,
@@ -630,7 +634,40 @@ export class SkpService implements ISkpService {
         }
       }
 
-      // Delete in transaction to maintain referential integrity
+      // Soft delete: only set the deletedAt timestamp
+      const deletedSkp = await this.prisma.skp.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      return {
+        data: { ...data, deletedAt: deletedSkp.deletedAt },
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Skp deleted successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to delete skp', error);
+      throw error;
+    }
+  }
+
+  async permanentDelete(id: string): Promise<IApiResponse<any> | null> {
+    try {
+      // Check if SKP exists (including soft-deleted ones)
+      const skp = await this.prisma.skp.findUnique({
+        where: { id },
+      });
+
+      if (!skp) {
+        throw new NotFoundException(`SKP with id ${id} not found`);
+      }
+
+      this.logger.warn(`Permanently deleting SKP with id ${id}`);
+
+      // Hard delete in transaction to maintain referential integrity
       await this.prisma.$transaction(async (tx) => {
         // Delete lampirans first
         await tx.skpLampiran.deleteMany({
@@ -652,22 +689,74 @@ export class SkpService implements ISkpService {
           },
         });
 
-        // Delete SKP
+        // Delete RHK period penilaians
+        await tx.rhkPeriodePenilaian.deleteMany({
+          where: { skpId: id },
+        });
+
+        // Delete RHKs
+        await tx.rhk.deleteMany({
+          where: { skpId: id },
+        });
+
+        // Hard delete SKP
         await tx.skp.delete({ where: { id } });
       });
+
       return {
-        data,
+        data: { id },
         code: HttpStatus.OK,
         status: StatusApi.SUCCESS,
-        message: 'Skp deleted successfully',
+        message: 'SKP permanently deleted successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to delete skp', error);
+      this.logger.error('Failed to permanently delete skp', error);
+      throw error;
+    }
+  }
+
+  async restore(id: string): Promise<IApiResponse<ISkp> | null> {
+    try {
+      // Check if SKP exists and is soft-deleted
+      const skp = await this.prisma.skp.findUnique({
+        where: { id },
+      });
+
+      if (!skp) {
+        throw new NotFoundException(`SKP with id ${id} not found`);
+      }
+
+      if (!skp.deletedAt) {
+        throw new BadRequestException('SKP is not soft-deleted');
+      }
+
+      // Restore the SKP
+      const restoredSkp = await this.prisma.skp.update({
+        where: { id },
+        data: {
+          deletedAt: null,
+        },
+      });
+
+      this.logger.log(`SKP with id ${id} restored successfully`);
+
+      // Fetch the restored SKP with all relations
+      const result = await this.checkData(id, true);
+
+      return {
+        data: result,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'SKP restored successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to restore skp', error);
       throw error;
     }
   }
 
   async submit(
+
     id: string,
     userNip: string,
   ): Promise<IApiResponse<ISkp> | null> {
@@ -841,7 +930,7 @@ export class SkpService implements ISkpService {
       }
 
       const newRhk = await this.prisma.$transaction(async (tx) => {
-        // Create RHK
+        // Create RHK with optional parent relationship
         const rhk = await tx.rhk.create({
           data: {
             desc: createRhkDto.desc,
@@ -849,6 +938,7 @@ export class SkpService implements ISkpService {
             jenis: createRhkDto.jenis,
             penugasan: createRhkDto.penugasan,
             skpId,
+            parentRhkId: createRhkDto.parentRhkId || null,
           },
         });
 
@@ -877,6 +967,8 @@ export class SkpService implements ISkpService {
         return tx.rhk.findUnique({
           where: { id: rhk.id },
           include: {
+            parentRhk: true,
+            childRhks: true,
             rhkRkts: {
               include: {
                 rkt: true,
@@ -980,12 +1072,31 @@ export class SkpService implements ISkpService {
           rhkData.jenis = updateRhkDto.jenis;
         if (updateRhkDto.penugasan !== undefined)
           rhkData.penugasan = updateRhkDto.penugasan;
+        if (updateRhkDto.parentRhkId !== undefined)
+          rhkData.parentRhkId = updateRhkDto.parentRhkId || null;
 
         // Update RHK
         const updated = await tx.rhk.update({
           where: { id: rhkId },
           data: rhkData,
         });
+
+        // Update child RHK relationships if childRhkIds provided
+        if (updateRhkDto.childRhkIds !== undefined) {
+          // Set all current children to have no parent (orphan them)
+          await tx.rhk.updateMany({
+            where: { parentRhkId: rhkId },
+            data: { parentRhkId: null },
+          });
+
+          // Set new children to have this RHK as parent
+          if (updateRhkDto.childRhkIds.length > 0) {
+            await tx.rhk.updateMany({
+              where: { id: { in: updateRhkDto.childRhkIds } },
+              data: { parentRhkId: rhkId },
+            });
+          }
+        }
 
         // Update RhkRkt relationships if rktIds provided
         if (updateRhkDto.rktIds !== undefined) {
@@ -1009,11 +1120,14 @@ export class SkpService implements ISkpService {
         return tx.rhk.findUnique({
           where: { id: rhkId },
           include: {
+            parentRhk: true,
+            childRhks: true,
             rhkRkts: {
               include: {
                 rkt: true,
               },
             },
+            rhkAspeks: true,
           },
         });
       });
@@ -1026,6 +1140,74 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error(`Failed to update RHK ${rhkId} in SKP ${skpId}`, error);
+      throw error;
+    }
+  }
+
+  async findRhkBySKP(skpId: string): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists
+      await this.checkData(skpId);
+
+      // Fetch the current SKP with parent relationship
+      const skp = await this.prisma.skp.findUnique({
+        where: { id: skpId },
+        include: {
+          parentSkps: {
+            include: { parent: true },
+          },
+        },
+      });
+
+      // Fetch all RHKs for the current SKP with parent/child relationships and SKP data
+      const rhks = await this.prisma.rhk.findMany({
+        where: { skpId },
+        include: {
+          skp: true,
+          parentRhk: true,
+          childRhks: true,
+          rhkRkts: {
+            include: {
+              rkt: true,
+            },
+          },
+          rhkAspeks: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Fetch parent SKP's RHKs if parent exists
+      let parentSkpRhk: any[] = [];
+      if (skp && skp.parentSkps && skp.parentSkps.length > 0) {
+        const parentSkpId = skp.parentSkps[0].parent.id;
+        parentSkpRhk = await this.prisma.rhk.findMany({
+          where: { skpId: parentSkpId },
+          include: {
+            skp: true,
+            parentRhk: true,
+            childRhks: true,
+            rhkRkts: {
+              include: {
+                rkt: true,
+              },
+            },
+            rhkAspeks: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+
+      return {
+        data: {
+          rhks,
+          parentSkpRhk,
+        },
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'RHK list retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to retrieve RHK list for SKP ${skpId}`, error);
       throw error;
     }
   }

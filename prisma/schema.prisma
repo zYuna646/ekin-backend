@@ -294,12 +294,16 @@ model Skp {
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
   skpLampirans SkpLampiran[]
 
+  isJPT Boolean @default(false)
+
   // Parent-child relationships
-  childSkps  SkpRelation[] @relation("parentSkp")
-  parentSkps SkpRelation[] @relation("childSkp")
-  rhks       Rhk[]
+  childSkps            SkpRelation[]         @relation("parentSkp")
+  parentSkps           SkpRelation[]         @relation("childSkp")
+  rhks                 Rhk[]
+  rhkPeriodePenilaians RhkPeriodePenilaian[]
 }
 
 model SkpRelation {
@@ -338,12 +342,16 @@ model Rhk {
   skpId String
   skp   Skp    @relation(fields: [skpId], references: [id])
 
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  rhkRkts    RhkRkt[]
-  childRhks  RhkRelation[] @relation("parentRhk")
-  parentRhks RhkRelation[] @relation("childRhk")
-  rhkAspeks  RhkAspek[]
+  // Parent-child relationship: one parent, many children
+  parentRhkId String?
+  parentRhk   Rhk?    @relation("parentChild", fields: [parentRhkId], references: [id], onDelete: Cascade)
+  childRhks   Rhk[]   @relation("parentChild")
+
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  rhkRkts              RhkRkt[]
+  rhkAspeks            RhkAspek[]
+  rhkPeriodePenilaians RhkPeriodePenilaian[]
 }
 
 model RhkRkt {
@@ -356,20 +364,6 @@ model RhkRkt {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model RhkRelation {
-  id       String @id @default(uuid())
-  parentId String
-  childId  String
-
-  parent Rhk @relation("parentRhk", fields: [parentId], references: [id], onDelete: Cascade)
-  child  Rhk @relation("childRhk", fields: [childId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([parentId, childId])
 }
 
 model RhkAspek {
@@ -391,6 +385,30 @@ model Status {
   modelId String
   value   String
   remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PeriodePenilaian {
+  id        String   @id @default(uuid())
+  startDate DateTime
+  endDate   DateTime
+  unitId    String
+
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  rhkPeriodePenilaians RhkPeriodePenilaian[]
+}
+
+model RhkPeriodePenilaian {
+  id                 String           @id @default(uuid())
+  skpId              String
+  skp                Skp              @relation(fields: [skpId], references: [id])
+  rhkId              String
+  rhk                Rhk              @relation(fields: [rhkId], references: [id])
+  periodePenilaianId String
+  periodePenilaian   PeriodePenilaian @relation(fields: [periodePenilaianId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

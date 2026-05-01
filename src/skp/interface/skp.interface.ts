@@ -23,6 +23,7 @@ export interface ISkp {
   statuses?: ISkpStatus[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 export interface ISkpService {
@@ -41,12 +42,18 @@ export interface ISkpService {
     userRoles?: string[],
   ): Promise<IApiResponse<ISkp[]> | null>;
   findOne(id: string): Promise<IApiResponse<ISkp> | null>;
+  findBawahan(
+    parentSkpId: string,
+    filtersSkpDto: any,
+  ): Promise<IApiResponse<ISkp[]> | null>;
   update(id: string, updateSkpDto: any): Promise<IApiResponse<ISkp> | null>;
   updateLampirans(
     id: string,
     updateSkpLampiranDto: any,
   ): Promise<IApiResponse<ISkp> | null>;
   remove(id: string, userNip?: string): Promise<IApiResponse<ISkp> | null>;
+  permanentDelete(id: string): Promise<IApiResponse<any> | null>;
+  restore(id: string): Promise<IApiResponse<ISkp> | null>;
   submit(id: string, userNip: string): Promise<IApiResponse<ISkp> | null>;
   approve(
     id: string,

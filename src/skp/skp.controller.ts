@@ -75,7 +75,7 @@ export class SkpController {
   }
 
   @Owner(MODEL_LIST.SKP, 'nip')
-  @Roles(ROLES.JPT)
+  @Roles(ROLES.JPT, ROLES.ASN)
   @UseGuards(OwnerGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<IApiResponse<ISkp> | null> {
@@ -101,6 +101,22 @@ export class SkpController {
   ): Promise<IApiResponse<ISkp> | null> {
     const userNip = req.user?.nipBaru;
     return this.skpService.remove(id, userNip);
+  }
+
+  @Roles(ROLES.JPT)
+  @Delete(':id/permanent')
+  permanentDelete(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<any> | null> {
+    return this.skpService.permanentDelete(id);
+  }
+
+  @Roles(ROLES.JPT)
+  @Post(':id/restore')
+  restore(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<ISkp> | null> {
+    return this.skpService.restore(id);
   }
 
   @Owner(MODEL_LIST.SKP, 'nip')
@@ -169,5 +185,11 @@ export class SkpController {
     @Param('rhkId') rhkId: string,
   ): Promise<IApiResponse<any> | null> {
     return this.skpService.removeRhk(skpId, rhkId);
+  }
+
+  @Roles(ROLES.JPT, ROLES.ASN)
+  @Get(':id/rhk')
+  findRhkBySKP(@Param('id') skpId: string): Promise<IApiResponse<any> | null> {
+    return this.skpService.findRhkBySKP(skpId);
   }
 }

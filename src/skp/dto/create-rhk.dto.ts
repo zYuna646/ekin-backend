@@ -19,4 +19,8 @@ export class CreateRhkDto {
   @IsArray()
   @IsString({ each: true })
   rktIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  parentRhkId?: string; // Optional parent RHK ID (one-to-one parent relationship)
 }

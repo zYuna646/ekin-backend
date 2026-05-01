@@ -17,6 +17,7 @@ import { JptModule } from './jpt/jpt.module';
 import { SettingsModule } from './settings/settings.module';
 import { SkpModule } from './skp/skp.module';
 import { UnorModule } from './unor/unor.module';
+import { PeriodePenilaianModule } from './periode-penilaian/periode-penilaian.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UnorModule } from './unor/unor.module';
     SettingsModule,
     SkpModule,
     UnorModule,
+    PeriodePenilaianModule,
   ],
   controllers: [AppController],
   providers: [AppService],

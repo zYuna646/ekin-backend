@@ -4,4 +4,5 @@ export const ROLES = {
   UMPEG: 'UMPEG',
   VERIFIKATOR: 'VERIFIKATOR',
   ASN: 'ASN',
+  PIMPINAN: 'PIMPINAN',
 };
