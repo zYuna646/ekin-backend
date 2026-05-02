@@ -10,13 +10,28 @@ services:
       - uploads_volume:/app/uploads
 
   postgres:
+    image: postgres:15-alpine
     env_file:
       - .env.staging
     restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
   redis:
+    image: redis:7-alpine
     restart: always
+    volumes:
+      - redis_data:/data
 
 volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
   uploads_volume:
     driver: local
+

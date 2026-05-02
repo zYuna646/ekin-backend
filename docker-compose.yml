@@ -6,9 +6,8 @@ services:
     container_name: nest_api
     restart: unless-stopped
 
-    environment:
-      NODE_ENV: production
-      API_URL: https://${API_DOMAIN}
+    env_file:
+      - .env
 
     ports:
       - "3000:3000"
@@ -28,9 +27,12 @@ services:
     container_name: postgres
     restart: unless-stopped
 
+    env_file:
+      - .env
+
     environment:
       POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
     volumes:
