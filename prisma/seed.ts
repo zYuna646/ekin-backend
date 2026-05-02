@@ -1,9 +1,7 @@
-// Load environment variables first, before importing PrismaClient
-require('dotenv').config({ path: '.env' });
-
+import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { runAllSeeders } from './seeders/index';
+import { runAllSeeders } from './seeders';
 
 const connectionString = process.env.DATABASE_URL;
 
