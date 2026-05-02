@@ -3,7 +3,7 @@ require('dotenv').config({ path: '.env' });
 
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { runAllSeeders } from './seeders';
+import { runAllSeeders } from './seeders/index';
 
 const connectionString = process.env.DATABASE_URL;
 
