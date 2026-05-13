@@ -137,6 +137,26 @@ export class JptService implements IJptService {
     }
   }
 
+  async findByUnitId(
+    unitId: string,
+  ): Promise<IApiResponse<IJpt[]> | null> {
+    try {
+      const data = await this.prisma.jpt.findMany({
+        where: { unitId },
+      });
+
+      return {
+        data,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Jpt list retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to retrieve jpt by unitId', error);
+      throw error;
+    }
+  }
+
   async update(
     id: string,
     updateJptDto: UpdateJptDto,

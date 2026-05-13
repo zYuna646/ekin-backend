@@ -14,6 +14,7 @@ export interface IJptService {
   create(createJptDto: any): Promise<IApiResponse<IJpt> | null>;
   findAll(filters: any): Promise<IApiResponse<IJpt[]> | null>;
   findOne(id: string): Promise<IApiResponse<IJpt> | null>;
+  findByUnitId(unitId: string): Promise<IApiResponse<IJpt[]> | null>;
   update(id: string, updateJptDto: any): Promise<IApiResponse<IJpt> | null>;
   remove(id: string): Promise<IApiResponse<IJpt> | null>;
 }

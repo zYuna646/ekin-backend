@@ -40,6 +40,13 @@ export class JptController {
     return this.jptService.findAll(filters);
   }
 
+  @Get('unit/:unitId')
+  findByUnitId(
+    @Param('unitId') unitId: string,
+  ): Promise<IApiResponse<IJpt[]> | null> {
+    return this.jptService.findByUnitId(unitId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<IApiResponse<IJpt> | null> {
     return this.jptService.findOne(id);

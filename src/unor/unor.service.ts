@@ -67,6 +67,47 @@ export class UnorService implements IUnorService {
       throw error;
     }
   }
+
+  async getUnorDetails(
+    id: string,
+    userRoles: string[] = [],
+    userUmpeg: any[] = [],
+    userJpt: any[] = [],
+  ): Promise<IApiResponse<IUnorDetails>> {
+    try {
+      // Check authorization for non-admin users
+      if (!userRoles.includes(ROLES.ADMIN)) {
+        const allowedUnits = [
+          ...(userUmpeg?.map((u) => u.toString()) || []),
+          ...(userJpt?.map((u) => u.toString()) || []),
+        ];
+
+        if (!allowedUnits.includes(id?.toString())) {
+          this.logger.warn(
+            `User attempted to access unauthorized UNOR details with id ${id}`,
+          );
+          throw new ForbiddenException('You do not have access to this UNOR');
+        }
+      }
+
+      const data: IUnorDetails =
+        await this.idasnUnorService.getUnorDetails(id);
+
+      return {
+        data,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Unor details fetched successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch Unor details with id ${id}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
   async getUnor(
     filters: FilterUnorDto,
     userRoles: string[] = [],

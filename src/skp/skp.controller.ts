@@ -9,7 +9,11 @@ import {
   Query,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import type { File } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { SkpService } from './skp.service';
 import { CreateSkpDto } from './dto/create-skp.dto';
 import { CreateBawahanSkpDto } from './dto/create-bawahan-skp.dto';
@@ -19,6 +23,8 @@ import { UpdateSkpLampiranDto } from './dto/update-skp-lampiran.dto';
 import { SubmitSkpDto } from './dto/submit-skp.dto';
 import { ApproveSkpDto } from './dto/approve-skp.dto';
 import { RejectSkpDto } from './dto/reject-skp.dto';
+import { CreateSkpPerjanjianKinerjaDto } from './dto/create-skp-perjanjian-kinerja.dto';
+import { DeleteSkpPerjanjianKinerjaDto } from './dto/delete-skp-perjanjian-kinerja.dto';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { ISkp } from './interface/skp.interface';
 import { FiltersSkpDto } from './dto/filters-skp.dto';
@@ -191,5 +197,43 @@ export class SkpController {
   @Get(':id/rhk')
   findRhkBySKP(@Param('id') skpId: string): Promise<IApiResponse<any> | null> {
     return this.skpService.findRhkBySKP(skpId);
+  }
+
+  @Owner(MODEL_LIST.SKP, 'nip')
+  @Roles(ROLES.PIMPINAN, ROLES.JPT)
+  @UseGuards(OwnerGuard)
+  @Post(':id/perjanjian-kinerja')
+  @UseInterceptors(FileInterceptor('file'))
+  createPerjanjianKinerja(
+    @Param('id') skpId: string,
+    @UploadedFile() file: File,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<IApiResponse<any> | null> {
+    const userNip = req.user?.nipBaru;
+    return this.skpService.createPerjanjianKinerja(skpId, file, userNip);
+  }
+
+  @Owner(MODEL_LIST.SKP, 'nip')
+  @Roles(ROLES.PIMPINAN, ROLES.JPT)
+  @UseGuards(OwnerGuard)
+  @Delete(':id/perjanjian-kinerja/:perjanjianId')
+  deletePerjanjianKinerja(
+    @Param('id') skpId: string,
+    @Param('perjanjianId') perjanjianId: string,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<IApiResponse<any> | null> {
+    const userNip = req.user?.nipBaru;
+    return this.skpService.deletePerjanjianKinerja(
+      skpId,
+      perjanjianId,
+      userNip,
+    );
+  }
+
+  @Get(':id/perjanjian-kinerja')
+  getPerjanjianKinerja(
+    @Param('id') skpId: string,
+  ): Promise<IApiResponse<any> | null> {
+    return this.skpService.getPerjanjianKinerja(skpId);
   }
 }

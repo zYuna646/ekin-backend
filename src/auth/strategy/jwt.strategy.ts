@@ -204,6 +204,37 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
           umpegUnitIds.push(...umpegRecords.map((record) => record.unitId));
         }
 
+        // Check PIMPINAN_UNIT_KERJA - find all records where nip array contains user.nipBaru
+        const pimpinanUnitKerjaRecords =
+          await this.prisma.pimpinanUnitKerja.findMany({
+            where: {
+              nip: {
+                has: user.nipBaru,
+              },
+            },
+          });
+
+        const pimpinanUnitKerjaData: Array<{
+          id: string;
+          unitKerjaId: string;
+          unitId: string;
+        }> = [];
+        if (pimpinanUnitKerjaRecords.length > 0) {
+          if (!roles.includes(ROLES.PIMPINAN)) {
+            roles.push(ROLES.PIMPINAN);
+          }
+          pimpinanUnitKerjaData.push(
+            ...pimpinanUnitKerjaRecords.map((record) => ({
+              id: record.id,
+              unitKerjaId: record.unitKerjaId,
+              unitId: record.unitId,
+            })),
+          );
+          this.logger.debug(
+            `User ${user.nipBaru} identified as PIMPINAN from PimpinanUnitKerja table with ${pimpinanUnitKerjaRecords.length} record(s)`,
+          );
+        }
+
         // Check PIMPINAN - check if user's jabatan name exists in the unor hierarchy
         try {
           const idasnApiUrl =
@@ -273,6 +304,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         }
         if (umpegUnitIds.length > 0) {
           user.umpeg = umpegUnitIds;
+        }
+        if (pimpinanUnitKerjaData.length > 0) {
+          user.pimpinanUnitKerja = pimpinanUnitKerjaData;
         }
       } catch (error) {
         this.logger.error(

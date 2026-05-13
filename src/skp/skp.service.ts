@@ -28,6 +28,9 @@ import { MODEL_LIST } from 'src/common/const/common.const';
 import { ROLES } from 'src/common/const/role.const';
 import { JabatanService } from 'src/idasn/services/jabatan.service';
 import { IJabatan } from 'src/idasn/interface/jabatan.interface';
+import type { File } from 'multer';
+import { FileUtils } from 'src/utils/file.utils';
+import { FILE_PATH } from 'src/common/const/file.const';
 
 @Injectable()
 export class SkpService implements ISkpService {
@@ -1208,6 +1211,142 @@ export class SkpService implements ISkpService {
       };
     } catch (error) {
       this.logger.error(`Failed to retrieve RHK list for SKP ${skpId}`, error);
+      throw error;
+    }
+  }
+
+  async createPerjanjianKinerja(
+    skpId: string,
+    file: File,
+    userNip: string,
+  ): Promise<IApiResponse<any> | null> {
+    try {
+      if (!file) {
+        throw new BadRequestException('File is required');
+      }
+
+      // Verify SKP exists and belongs to current user
+      const skp = await this.checkData(skpId);
+      if (skp.nip !== userNip) {
+        throw new ForbiddenException(
+          'You can only add perjanjian kinerja to your own SKP',
+        );
+      }
+
+      // Save file to disk
+      const filePath = FileUtils.getFilePath(
+        FILE_PATH.SKP_PERJANJIAN_KINERJA,
+      );
+      const savedFilePath = FileUtils.saveFile(filePath, file);
+
+      // Create database record
+      const perjanjianKinerja = await this.prisma.skpPerjanjianKinerja.create({
+        data: {
+          file: savedFilePath,
+          skpId,
+        },
+      });
+
+      this.logger.log(
+        `Perjanjian Kinerja created for SKP ${skpId} by user ${userNip}`,
+      );
+
+      return {
+        data: perjanjianKinerja,
+        code: HttpStatus.CREATED,
+        status: StatusApi.SUCCESS,
+        message: 'Perjanjian Kinerja created successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to create perjanjian kinerja for SKP ${skpId}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async deletePerjanjianKinerja(
+    skpId: string,
+    perjanjianId: string,
+    userNip: string,
+  ): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists and belongs to current user
+      const skp = await this.checkData(skpId);
+      if (skp.nip !== userNip) {
+        throw new ForbiddenException(
+          'You can only delete perjanjian kinerja from your own SKP',
+        );
+      }
+
+      // Verify perjanjian kinerja exists and belongs to this SKP
+      const perjanjianKinerja =
+        await this.prisma.skpPerjanjianKinerja.findFirst({
+          where: {
+            id: perjanjianId,
+            skpId,
+          },
+        });
+
+      if (!perjanjianKinerja) {
+        throw new NotFoundException(
+          `Perjanjian Kinerja with id ${perjanjianId} not found for this SKP`,
+        );
+      }
+
+      // Delete file from disk
+      if (perjanjianKinerja.file) {
+        FileUtils.deleteFile(perjanjianKinerja.file);
+      }
+
+      // Delete database record
+      await this.prisma.skpPerjanjianKinerja.delete({
+        where: { id: perjanjianId },
+      });
+
+      this.logger.log(
+        `Perjanjian Kinerja ${perjanjianId} deleted from SKP ${skpId} by user ${userNip}`,
+      );
+
+      return {
+        data: perjanjianKinerja,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Perjanjian Kinerja deleted successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete perjanjian kinerja ${perjanjianId} from SKP ${skpId}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async getPerjanjianKinerja(skpId: string): Promise<IApiResponse<any> | null> {
+    try {
+      // Verify SKP exists
+      await this.checkData(skpId);
+
+      // Get all perjanjian kinerja for this SKP
+      const perjanjianKinerjaList =
+        await this.prisma.skpPerjanjianKinerja.findMany({
+          where: { skpId },
+          orderBy: { createdAt: 'desc' },
+        });
+
+      return {
+        data: perjanjianKinerjaList,
+        code: HttpStatus.OK,
+        status: StatusApi.SUCCESS,
+        message: 'Perjanjian Kinerja list retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to retrieve perjanjian kinerja for SKP ${skpId}`,
+        error,
+      );
       throw error;
     }
   }

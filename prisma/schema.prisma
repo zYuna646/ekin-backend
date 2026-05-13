@@ -262,11 +262,24 @@ model Umpeg {
 model Jpt {
   id     String   @id @default(uuid())
   name   String
-  unitId String
+  unitId String   @unique
   nip    String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PimpinanUnitKerja {
+  id          String   @id @default(uuid())
+  name        String
+  unitKerjaId String
+  unitId      String
+  nip         String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([unitKerjaId, unitId])
 }
 
 model Settings {
@@ -300,10 +313,22 @@ model Skp {
   isJPT Boolean @default(false)
 
   // Parent-child relationships
-  childSkps            SkpRelation[]         @relation("parentSkp")
-  parentSkps           SkpRelation[]         @relation("childSkp")
-  rhks                 Rhk[]
-  rhkPeriodePenilaians RhkPeriodePenilaian[]
+  childSkps             SkpRelation[]          @relation("parentSkp")
+  parentSkps            SkpRelation[]          @relation("childSkp")
+  rhks                  Rhk[]
+  rhkPeriodePenilaians  RhkPeriodePenilaian[]
+  skpPerjanjianKinerjas SkpPerjanjianKinerja[]
+}
+
+model SkpPerjanjianKinerja {
+  id String @id @default(uuid())
+
+  file  String
+  skpId String
+  skp   Skp    @relation(fields: [skpId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SkpRelation {

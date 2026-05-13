@@ -58,6 +58,23 @@ export class UnorController {
   }
 
   @Roles(ROLES.ADMIN, ROLES.UMPEG, ROLES.JPT)
+  @Get(':id/details')
+  getUnorDetails(
+    @Param('id') id: string,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<IApiResponse<any>> {
+    const userRoles = req.user?.roles || [];
+    const userUmpeg = req.user?.umpeg || [];
+    const userJpt = req.user?.jpt || [];
+    return this.unorService.getUnorDetails(
+      id,
+      userRoles,
+      userUmpeg,
+      userJpt,
+    );
+  }
+
+  @Roles(ROLES.ADMIN, ROLES.UMPEG, ROLES.JPT)
   @Get(':id')
   getUnorById(
     @Param('id') id: string,

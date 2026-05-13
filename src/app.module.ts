@@ -18,6 +18,7 @@ import { SettingsModule } from './settings/settings.module';
 import { SkpModule } from './skp/skp.module';
 import { UnorModule } from './unor/unor.module';
 import { PeriodePenilaianModule } from './periode-penilaian/periode-penilaian.module';
+import { PimpinanUnitKerjaModule } from './pimpinan-unit-kerja/pimpinan-unit-kerja.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PeriodePenilaianModule } from './periode-penilaian/periode-penilaian.mo
     SkpModule,
     UnorModule,
     PeriodePenilaianModule,
+    PimpinanUnitKerjaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
