@@ -36,7 +36,7 @@ export class RenstraService {
   async checkData(id: string): Promise<IRenstra> {
     try {
       const data = await this.prisma.renstra.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           renstraMisis: {
             include: {
@@ -117,6 +117,7 @@ export class RenstraService {
       const { search, unitIds, misiId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(search && {
           name: {
@@ -250,7 +251,10 @@ export class RenstraService {
   async remove(id: string): Promise<IApiResponse<IRenstra> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.renstra.delete({ where: { id } });
+      await this.prisma.renstra.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

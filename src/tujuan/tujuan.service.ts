@@ -35,7 +35,7 @@ export class TujuanService implements ITujuanService {
   async checkData(id: string): Promise<ITujuan> {
     try {
       const data = await this.prisma.tujuan.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           renstra: true,
           tujuanIndicators: {
@@ -131,6 +131,7 @@ export class TujuanService implements ITujuanService {
       const { search, unitIds, renstraId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(renstraId && { renstraId }),
         ...(search && {
@@ -264,7 +265,10 @@ export class TujuanService implements ITujuanService {
   async remove(id: string): Promise<IApiResponse<ITujuan> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.tujuan.delete({ where: { id } });
+      await this.prisma.tujuan.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

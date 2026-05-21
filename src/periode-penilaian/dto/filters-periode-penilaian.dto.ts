@@ -1,10 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsArray,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsArray } from 'class-validator';
 
 export class FiltersPeriodePenilaianDto {
   @IsString()

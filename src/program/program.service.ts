@@ -35,7 +35,7 @@ export class ProgramService implements IProgramService {
   async checkData(id: string): Promise<IProgram> {
     try {
       const data = await this.prisma.program.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           tujuan: true,
           programIndicators: {
@@ -129,6 +129,7 @@ export class ProgramService implements IProgramService {
       const { search, unitIds, tujuanId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(tujuanId && { tujuanId }),
         ...(search && {
@@ -264,7 +265,10 @@ export class ProgramService implements IProgramService {
   async remove(id: string): Promise<IApiResponse<IProgram> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.program.delete({ where: { id } });
+      await this.prisma.program.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

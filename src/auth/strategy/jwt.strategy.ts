@@ -112,7 +112,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const searchName = jabatanName.trim().toUpperCase();
     const currentName = unorDetails.namaJabatan?.trim().toUpperCase() || '';
 
-
     // Check if current unit's jabatan matches
     if (currentName === searchName) {
       return true;

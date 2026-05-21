@@ -21,7 +21,7 @@ export class VisiService implements IVisiService {
   async checkData(id: string): Promise<IVisi> {
     try {
       const data = await this.prisma.visi.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: { misi: true },
       });
       if (!data) {
@@ -63,12 +63,13 @@ export class VisiService implements IVisiService {
       const offset = (page - 1) * perPage;
       const where = search
         ? {
+            deletedAt: null,
             name: {
               contains: search,
               mode: Prisma.QueryMode.insensitive,
             },
           }
-        : {};
+        : { deletedAt: null };
 
       const [totalItems, data] = await this.prisma.$transaction([
         this.prisma.visi.count({ where }),
@@ -141,7 +142,10 @@ export class VisiService implements IVisiService {
   async remove(id: string): Promise<IApiResponse<IVisi> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.visi.delete({ where: { id } });
+      await this.prisma.visi.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

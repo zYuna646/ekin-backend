@@ -21,7 +21,7 @@ export class MisiService implements IMisiService {
   async checkData(id: string): Promise<IMisi> {
     try {
       const data = await this.prisma.misi.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: { visi: true },
       });
       if (!data) {
@@ -62,6 +62,7 @@ export class MisiService implements IMisiService {
       const { search, visiId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(visiId && {
           visiId,
         }),
@@ -143,7 +144,10 @@ export class MisiService implements IMisiService {
   async remove(id: string): Promise<IApiResponse<IMisi> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.misi.delete({ where: { id } });
+      await this.prisma.misi.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

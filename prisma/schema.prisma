@@ -21,6 +21,7 @@ model Visi {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 model Misi {
@@ -33,6 +34,7 @@ model Misi {
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
   renstraMisis RenstraMisi[]
 }
 
@@ -45,6 +47,7 @@ model Renstra {
   unitId       String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
   renstraMisis RenstraMisi[]
   tujuans      Tujuan[]
   rkts         Rkt[]
@@ -70,6 +73,7 @@ model Indicator {
   satuan String
 
   createdAt             DateTime               @default(now())
+  deletedAt             DateTime?
   updatedAt             DateTime               @updatedAt
   tujuanIndicators      TujuanIndicator[]
   programIndicators     ProgramIndicator[]
@@ -89,6 +93,7 @@ model Tujuan {
   renstra   Renstra @relation(fields: [renstraId], references: [id])
 
   createdAt        DateTime          @default(now())
+  deletedAt        DateTime?
   updatedAt        DateTime          @updatedAt
   tujuanIndicators TujuanIndicator[]
   programs         Program[]
@@ -103,6 +108,7 @@ model Program {
   tujuan        Tujuan @relation(fields: [tujuanId], references: [id])
 
   createdAt         DateTime           @default(now())
+  deletedAt         DateTime?
   updatedAt         DateTime           @updatedAt
   programIndicators ProgramIndicator[]
   kegiatans         Kegiatan[]
@@ -117,6 +123,7 @@ model Kegiatan {
   program       Program @relation(fields: [programId], references: [id])
 
   createdAt          DateTime            @default(now())
+  deletedAt          DateTime?
   updatedAt          DateTime            @updatedAt
   kegiatanIndicators KegiatanIndicator[]
   subKegiatans       SubKegiatan[]
@@ -130,6 +137,7 @@ model SubKegiatan {
   kegiatanId    String
   kegiatan      Kegiatan @relation(fields: [kegiatanId], references: [id])
 
+  deletedAt             DateTime?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   subKegiatanIndicators SubKegiatanIndicator[]
@@ -194,6 +202,7 @@ model Rkt {
   renstra         Renstra          @relation(fields: [renstraId], references: [id])
   rktSubKegiatans RktSubKegiatan[]
 
+  deletedAt            DateTime?
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   rktInputIndicators   RktInputIndicator[]
@@ -254,6 +263,7 @@ model Umpeg {
   name   String
   unitId String
   nip    String[]
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -264,6 +274,7 @@ model Jpt {
   name   String
   unitId String   @unique
   nip    String[]
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -274,6 +285,7 @@ model PimpinanUnitKerja {
   name        String
   unitKerjaId String
   unitId      String
+  deletedAt DateTime?
   nip         String[]
 
   createdAt DateTime @default(now())
@@ -285,6 +297,7 @@ model PimpinanUnitKerja {
 model Settings {
   id    String @id @default(uuid())
   key   String
+  deletedAt DateTime?
   value String
 
   createdAt DateTime @default(now())
@@ -324,6 +337,7 @@ model SkpPerjanjianKinerja {
   id String @id @default(uuid())
 
   file  String
+  deletedAt DateTime?
   skpId String
   skp   Skp    @relation(fields: [skpId], references: [id])
 
@@ -350,6 +364,7 @@ model SkpLampiran {
   name  String
   value String[]
   skpId String
+  deletedAt DateTime?
 
   skp Skp @relation(fields: [skpId], references: [id])
 
@@ -368,6 +383,7 @@ model Rhk {
   skp   Skp    @relation(fields: [skpId], references: [id])
 
   // Parent-child relationship: one parent, many children
+  deletedAt            DateTime?
   parentRhkId String?
   parentRhk   Rhk?    @relation("parentChild", fields: [parentRhkId], references: [id], onDelete: Cascade)
   childRhks   Rhk[]   @relation("parentChild")
@@ -396,6 +412,7 @@ model RhkAspek {
   desc  String?
   jenis String
 
+  deletedAt   DateTime?
   rhkId       String
   rhk         Rhk        @relation(fields: [rhkId], references: [id])
   indicatorId String?
@@ -406,6 +423,7 @@ model RhkAspek {
 
 model Status {
   id      String  @id @default(uuid())
+  deletedAt DateTime?
   model   String
   modelId String
   value   String
@@ -416,7 +434,9 @@ model Status {
 }
 
 model PeriodePenilaian {
+  deletedAt            DateTime?
   id        String   @id @default(uuid())
+  name      String
   startDate DateTime
   endDate   DateTime
   unitId    String

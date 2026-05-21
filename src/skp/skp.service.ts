@@ -759,7 +759,6 @@ export class SkpService implements ISkpService {
   }
 
   async submit(
-
     id: string,
     userNip: string,
   ): Promise<IApiResponse<ISkp> | null> {
@@ -1015,16 +1014,12 @@ export class SkpService implements ISkpService {
         throw new BadRequestException('RHK does not belong to this SKP');
       }
 
-      // Delete in transaction to maintain referential integrity
+      // Soft delete in transaction
       await this.prisma.$transaction(async (tx) => {
-        // Delete RhkRkt relationships first
-        await tx.rhkRkt.deleteMany({
-          where: { rhkId },
-        });
-
-        // Delete the RHK
-        await tx.rhk.delete({
+        // Soft delete the RHK
+        await tx.rhk.update({
           where: { id: rhkId },
+          data: { deletedAt: new Date() },
         });
       });
 
@@ -1234,9 +1229,7 @@ export class SkpService implements ISkpService {
       }
 
       // Save file to disk
-      const filePath = FileUtils.getFilePath(
-        FILE_PATH.SKP_PERJANJIAN_KINERJA,
-      );
+      const filePath = FileUtils.getFilePath(FILE_PATH.SKP_PERJANJIAN_KINERJA);
       const savedFilePath = FileUtils.saveFile(filePath, file);
 
       // Create database record
@@ -1300,9 +1293,10 @@ export class SkpService implements ISkpService {
         FileUtils.deleteFile(perjanjianKinerja.file);
       }
 
-      // Delete database record
-      await this.prisma.skpPerjanjianKinerja.delete({
+      // Soft delete database record
+      await this.prisma.skpPerjanjianKinerja.update({
         where: { id: perjanjianId },
+        data: { deletedAt: new Date() },
       });
 
       this.logger.log(

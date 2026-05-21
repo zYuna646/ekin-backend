@@ -24,12 +24,10 @@ export class PimpinanUnitKerjaService implements IPimpinanUnitKerjaService {
   async checkData(id: string): Promise<IPimpinanUnitKerja> {
     try {
       const data = await this.prisma.pimpinanUnitKerja.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
       });
       if (!data) {
-        this.logger.warn(
-          `PimpinanUnitKerja with id ${id} not found`,
-        );
+        this.logger.warn(`PimpinanUnitKerja with id ${id} not found`);
         throw new NotFoundException(
           `PimpinanUnitKerja with id ${id} not found`,
         );
@@ -46,15 +44,17 @@ export class PimpinanUnitKerjaService implements IPimpinanUnitKerjaService {
   ): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
     try {
       // Check if record with same unitKerjaId already exists
-      const existingRecord =
-        await this.prisma.pimpinanUnitKerja.findFirst({
-          where: { unitKerjaId: createPimpinanUnitKerjaDto.unitKerjaId },
-        });
+      const existingRecord = await this.prisma.pimpinanUnitKerja.findFirst({
+        where: { unitKerjaId: createPimpinanUnitKerjaDto.unitKerjaId },
+      });
 
       if (existingRecord) {
         // Merge and deduplicate NIPs
         const mergedNips = [
-          ...new Set([...existingRecord.nip, ...createPimpinanUnitKerjaDto.nip]),
+          ...new Set([
+            ...existingRecord.nip,
+            ...createPimpinanUnitKerjaDto.nip,
+          ]),
         ];
 
         // Update existing record with merged NIPs
@@ -98,6 +98,7 @@ export class PimpinanUnitKerjaService implements IPimpinanUnitKerjaService {
       const { search, unitId, unitKerjaId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitId && { unitId }),
         ...(unitKerjaId && { unitKerjaId }),
         ...(search && {
@@ -170,7 +171,10 @@ export class PimpinanUnitKerjaService implements IPimpinanUnitKerjaService {
         message: 'PimpinanUnitKerja list retrieved successfully',
       };
     } catch (error) {
-      this.logger.error('Failed to retrieve pimpinanUnitKerja by unitId', error);
+      this.logger.error(
+        'Failed to retrieve pimpinanUnitKerja by unitId',
+        error,
+      );
       throw error;
     }
   }
@@ -200,7 +204,10 @@ export class PimpinanUnitKerjaService implements IPimpinanUnitKerjaService {
   async remove(id: string): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.pimpinanUnitKerja.delete({ where: { id } });
+      await this.prisma.pimpinanUnitKerja.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

@@ -50,7 +50,9 @@ export class PimpinanUnitKerjaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
+  findOne(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
     return this.pimpinanUnitKerjaService.findOne(id);
   }
 
@@ -65,7 +67,9 @@ export class PimpinanUnitKerjaController {
 
   @Roles(ROLES.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
+  remove(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<IPimpinanUnitKerja> | null> {
     return this.pimpinanUnitKerjaService.remove(id);
   }
 }

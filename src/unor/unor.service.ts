@@ -92,8 +92,7 @@ export class UnorService implements IUnorService {
         }
       }
 
-      const data: IUnorDetails =
-        await this.idasnUnorService.getUnorDetails(id);
+      const data: IUnorDetails = await this.idasnUnorService.getUnorDetails(id);
 
       return {
         data,
@@ -102,10 +101,7 @@ export class UnorService implements IUnorService {
         message: 'Unor details fetched successfully',
       };
     } catch (error) {
-      this.logger.error(
-        `Failed to fetch Unor details with id ${id}`,
-        error,
-      );
+      this.logger.error(`Failed to fetch Unor details with id ${id}`, error);
       throw error;
     }
   }
@@ -342,7 +338,7 @@ export class UnorService implements IUnorService {
             try {
               // Get ASN details (name) from IDASN using NIP
               const asnDetails = await this.jabatanService.getPosJab(nip);
-              
+
               if (asnDetails) {
                 data.push({
                   unor: {
@@ -414,10 +410,7 @@ export class UnorService implements IUnorService {
         },
       };
     } catch (error) {
-      this.logger.error(
-        `Failed to fetch Jabatan by Unor with Bawahan`,
-        error,
-      );
+      this.logger.error(`Failed to fetch Jabatan by Unor with Bawahan`, error);
       throw error;
     }
   }

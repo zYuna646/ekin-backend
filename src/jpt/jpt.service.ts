@@ -21,7 +21,7 @@ export class JptService implements IJptService {
   async checkData(id: string): Promise<IJpt> {
     try {
       const data = await this.prisma.jpt.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
       });
       if (!data) {
         this.logger.warn(`Jpt with id ${id} not found`);
@@ -86,6 +86,7 @@ export class JptService implements IJptService {
       const { search, unitId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitId && { unitId }),
         ...(search && {
           OR: [
@@ -137,9 +138,7 @@ export class JptService implements IJptService {
     }
   }
 
-  async findByUnitId(
-    unitId: string,
-  ): Promise<IApiResponse<IJpt[]> | null> {
+  async findByUnitId(unitId: string): Promise<IApiResponse<IJpt[]> | null> {
     try {
       const data = await this.prisma.jpt.findMany({
         where: { unitId },
@@ -182,7 +181,10 @@ export class JptService implements IJptService {
   async remove(id: string): Promise<IApiResponse<IJpt> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.jpt.delete({ where: { id } });
+      await this.prisma.jpt.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

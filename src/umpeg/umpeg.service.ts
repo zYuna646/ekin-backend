@@ -21,7 +21,7 @@ export class UmpegService implements IUmpegService {
   async checkData(id: string): Promise<IUmpeg> {
     try {
       const data = await this.prisma.umpeg.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
       });
       if (!data) {
         this.logger.warn(`Umpeg with id ${id} not found`);
@@ -90,6 +90,7 @@ export class UmpegService implements IUmpegService {
       const { search, unitId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitId && { unitId }),
         ...(search && {
           OR: [
@@ -166,7 +167,10 @@ export class UmpegService implements IUmpegService {
   async remove(id: string): Promise<IApiResponse<IUmpeg> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.umpeg.delete({ where: { id } });
+      await this.prisma.umpeg.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

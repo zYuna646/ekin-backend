@@ -17,7 +17,9 @@ export interface IPimpinanUnitKerjaService {
   ): Promise<IApiResponse<IPimpinanUnitKerja> | null>;
   findAll(filters: any): Promise<IApiResponse<IPimpinanUnitKerja[]> | null>;
   findOne(id: string): Promise<IApiResponse<IPimpinanUnitKerja> | null>;
-  findByUnitId(unitId: string): Promise<IApiResponse<IPimpinanUnitKerja[]> | null>;
+  findByUnitId(
+    unitId: string,
+  ): Promise<IApiResponse<IPimpinanUnitKerja[]> | null>;
   update(
     id: string,
     updatePimpinanUnitKerjaDto: any,

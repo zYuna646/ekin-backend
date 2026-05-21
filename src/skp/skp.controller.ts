@@ -111,17 +111,13 @@ export class SkpController {
 
   @Roles(ROLES.JPT)
   @Delete(':id/permanent')
-  permanentDelete(
-    @Param('id') id: string,
-  ): Promise<IApiResponse<any> | null> {
+  permanentDelete(@Param('id') id: string): Promise<IApiResponse<any> | null> {
     return this.skpService.permanentDelete(id);
   }
 
   @Roles(ROLES.JPT)
   @Post(':id/restore')
-  restore(
-    @Param('id') id: string,
-  ): Promise<IApiResponse<ISkp> | null> {
+  restore(@Param('id') id: string): Promise<IApiResponse<ISkp> | null> {
     return this.skpService.restore(id);
   }
 

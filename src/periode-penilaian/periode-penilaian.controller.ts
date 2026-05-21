@@ -32,7 +32,9 @@ import { OwnerGuard } from 'src/auth/guard/owner.guard';
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('periode-penilaian')
 export class PeriodePenilaianController {
-  constructor(private readonly periodePenilaianService: PeriodePenilaianService) {}
+  constructor(
+    private readonly periodePenilaianService: PeriodePenilaianService,
+  ) {}
 
   @Roles(ROLES.ADMIN, ROLES.UMPEG)
   @Post()
@@ -59,14 +61,20 @@ export class PeriodePenilaianController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<IApiResponse<IPeriodePenilaian> | null> {
+  findOne(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<IPeriodePenilaian> | null> {
     return this.periodePenilaianService.findOne(id);
   }
 
-  @Owner(MODEL_LIST.PERIODE_PENILAIAN, OWNER_FIELD_LIST.PERIODE_PENILAIAN_OWNER, {
-    operator: COMPARISON_OPERATOR.EQUAL,
-    userField: COMPARISION_USER_FIELD_LIST.ROLES,
-  })
+  @Owner(
+    MODEL_LIST.PERIODE_PENILAIAN,
+    OWNER_FIELD_LIST.PERIODE_PENILAIAN_OWNER,
+    {
+      operator: COMPARISON_OPERATOR.EQUAL,
+      userField: COMPARISION_USER_FIELD_LIST.ROLES,
+    },
+  )
   @Roles(ROLES.ADMIN, ROLES.UMPEG)
   @UseGuards(OwnerGuard)
   @Patch(':id')
@@ -78,13 +86,19 @@ export class PeriodePenilaianController {
   }
 
   @Roles(ROLES.ADMIN, ROLES.UMPEG)
-  @Owner(MODEL_LIST.PERIODE_PENILAIAN, OWNER_FIELD_LIST.PERIODE_PENILAIAN_OWNER, {
-    operator: COMPARISON_OPERATOR.EQUAL,
-    userField: COMPARISION_USER_FIELD_LIST.ROLES,
-  })
+  @Owner(
+    MODEL_LIST.PERIODE_PENILAIAN,
+    OWNER_FIELD_LIST.PERIODE_PENILAIAN_OWNER,
+    {
+      operator: COMPARISON_OPERATOR.EQUAL,
+      userField: COMPARISION_USER_FIELD_LIST.ROLES,
+    },
+  )
   @UseGuards(OwnerGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<IApiResponse<IPeriodePenilaian> | null> {
+  remove(
+    @Param('id') id: string,
+  ): Promise<IApiResponse<IPeriodePenilaian> | null> {
     return this.periodePenilaianService.remove(id);
   }
 }

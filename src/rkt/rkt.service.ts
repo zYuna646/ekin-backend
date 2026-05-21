@@ -56,7 +56,7 @@ export class RktService implements IRktService {
   async checkData(id: string): Promise<IRkt> {
     try {
       const data = await this.prisma.rkt.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           renstra: true,
           rktSubKegiatans: { include: { subKegiatan: true } },
@@ -193,6 +193,7 @@ export class RktService implements IRktService {
       const { search, renstraId, unitIds, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(renstraId && {
           renstraId,
         }),
@@ -403,7 +404,10 @@ export class RktService implements IRktService {
   async remove(id: string): Promise<IApiResponse<IRkt> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.rkt.delete({ where: { id } });
+      await this.prisma.rkt.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

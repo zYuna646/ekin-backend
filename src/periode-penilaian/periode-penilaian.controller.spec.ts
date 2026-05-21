@@ -11,7 +11,9 @@ describe('PeriodePenilaianController', () => {
       providers: [PeriodePenilaianService],
     }).compile();
 
-    controller = module.get<PeriodePenilaianController>(PeriodePenilaianController);
+    controller = module.get<PeriodePenilaianController>(
+      PeriodePenilaianController,
+    );
   });
 
   it('should be defined', () => {

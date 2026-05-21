@@ -35,7 +35,7 @@ export class KegiatanService implements IKegiatanService {
   async checkData(id: string): Promise<IKegiatan> {
     try {
       const data = await this.prisma.kegiatan.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           program: true,
           kegiatanIndicators: {
@@ -129,6 +129,7 @@ export class KegiatanService implements IKegiatanService {
       const { search, unitIds, programId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(programId && { programId }),
         ...(search && {
@@ -264,7 +265,10 @@ export class KegiatanService implements IKegiatanService {
   async remove(id: string): Promise<IApiResponse<IKegiatan> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.kegiatan.delete({ where: { id } });
+      await this.prisma.kegiatan.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

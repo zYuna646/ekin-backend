@@ -8,7 +8,10 @@ import {
 import { CreatePeriodePenilaianDto } from './dto/create-periode-penilaian.dto';
 import { UpdatePeriodePenilaianDto } from './dto/update-periode-penilaian.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { IPeriodePenilaian, IPeriodePenilaianService } from './interface/periode-penilaian.interface';
+import {
+  IPeriodePenilaian,
+  IPeriodePenilaianService,
+} from './interface/periode-penilaian.interface';
 import { IApiResponse } from 'src/common/interface/api.interface';
 import { StatusApi } from 'src/common/enum/status.enum';
 import { FiltersPeriodePenilaianDto } from './dto/filters-periode-penilaian.dto';
@@ -35,11 +38,13 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
   async checkData(id: string): Promise<IPeriodePenilaian> {
     try {
       const data = await this.prisma.periodePenilaian.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
       });
       if (!data) {
         this.logger.warn(`Periode Penilaian with id ${id} not found`);
-        throw new NotFoundException(`Periode Penilaian with id ${id} not found`);
+        throw new NotFoundException(
+          `Periode Penilaian with id ${id} not found`,
+        );
       }
       return data;
     } catch (error) {
@@ -59,6 +64,7 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
 
       const data = await this.prisma.periodePenilaian.create({
         data: {
+          name: createPeriodePenilaianDto.name,
           startDate: createPeriodePenilaianDto.startDate,
           endDate: createPeriodePenilaianDto.endDate,
           unitId: createPeriodePenilaianDto.unitId,
@@ -84,6 +90,7 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
       const { search, unitIds, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(search && {
           unitId: {
@@ -131,7 +138,10 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
         message: 'Periode Penilaian retrieved successfully',
       };
     } catch (error) {
-      this.logger.error(`Failed to retrieve periode penilaian with id ${id}`, error);
+      this.logger.error(
+        `Failed to retrieve periode penilaian with id ${id}`,
+        error,
+      );
       throw error;
     }
   }
@@ -178,7 +188,10 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
   async remove(id: string): Promise<IApiResponse<IPeriodePenilaian> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.periodePenilaian.delete({ where: { id } });
+      await this.prisma.periodePenilaian.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,
@@ -186,7 +199,10 @@ export class PeriodePenilaianService implements IPeriodePenilaianService {
         message: 'Periode Penilaian removed successfully',
       };
     } catch (error) {
-      this.logger.error(`Failed to remove periode penilaian with id ${id}`, error);
+      this.logger.error(
+        `Failed to remove periode penilaian with id ${id}`,
+        error,
+      );
       throw error;
     }
   }

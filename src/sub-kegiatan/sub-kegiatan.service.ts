@@ -38,7 +38,7 @@ export class SubKegiatanService implements ISubKegiatanService {
   async checkData(id: string): Promise<ISubKegiatan> {
     try {
       const data = await this.prisma.subKegiatan.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
           kegiatan: true,
           subKegiatanIndicators: {
@@ -132,6 +132,7 @@ export class SubKegiatanService implements ISubKegiatanService {
       const { search, unitIds, kegiatanId, page = 1, perPage = 10 } = filters;
       const offset = (page - 1) * perPage;
       const where = {
+        deletedAt: null,
         ...(unitIds && unitIds.length > 0 && { unitId: { in: unitIds } }),
         ...(kegiatanId && { kegiatanId }),
         ...(search && {
@@ -268,7 +269,10 @@ export class SubKegiatanService implements ISubKegiatanService {
   async remove(id: string): Promise<IApiResponse<ISubKegiatan> | null> {
     try {
       const data = await this.checkData(id);
-      await this.prisma.subKegiatan.delete({ where: { id } });
+      await this.prisma.subKegiatan.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
       return {
         data,
         code: HttpStatus.OK,

@@ -11,7 +11,9 @@ describe('PimpinanUnitKerjaController', () => {
       providers: [PimpinanUnitKerjaService],
     }).compile();
 
-    controller = module.get<PimpinanUnitKerjaController>(PimpinanUnitKerjaController);
+    controller = module.get<PimpinanUnitKerjaController>(
+      PimpinanUnitKerjaController,
+    );
   });
 
   it('should be defined', () => {

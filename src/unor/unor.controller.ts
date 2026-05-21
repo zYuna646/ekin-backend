@@ -66,12 +66,7 @@ export class UnorController {
     const userRoles = req.user?.roles || [];
     const userUmpeg = req.user?.umpeg || [];
     const userJpt = req.user?.jpt || [];
-    return this.unorService.getUnorDetails(
-      id,
-      userRoles,
-      userUmpeg,
-      userJpt,
-    );
+    return this.unorService.getUnorDetails(id, userRoles, userUmpeg, userJpt);
   }
 
   @Roles(ROLES.ADMIN, ROLES.UMPEG, ROLES.JPT)
