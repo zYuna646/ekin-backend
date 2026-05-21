@@ -19,8 +19,8 @@ model Visi {
 
   misi Misi[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 }
 
@@ -259,10 +259,10 @@ model RktOutcomeIndicator {
 }
 
 model Umpeg {
-  id     String   @id @default(uuid())
-  name   String
-  unitId String
-  nip    String[]
+  id        String    @id @default(uuid())
+  name      String
+  unitId    String
+  nip       String[]
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -270,10 +270,10 @@ model Umpeg {
 }
 
 model Jpt {
-  id     String   @id @default(uuid())
-  name   String
-  unitId String   @unique
-  nip    String[]
+  id        String    @id @default(uuid())
+  name      String
+  unitId    String    @unique
+  nip       String[]
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -281,11 +281,11 @@ model Jpt {
 }
 
 model PimpinanUnitKerja {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   unitKerjaId String
   unitId      String
-  deletedAt DateTime?
+  deletedAt   DateTime?
   nip         String[]
 
   createdAt DateTime @default(now())
@@ -295,10 +295,10 @@ model PimpinanUnitKerja {
 }
 
 model Settings {
-  id    String @id @default(uuid())
-  key   String
+  id        String    @id @default(uuid())
+  key       String
   deletedAt DateTime?
-  value String
+  value     String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -336,10 +336,10 @@ model Skp {
 model SkpPerjanjianKinerja {
   id String @id @default(uuid())
 
-  file  String
+  file      String
   deletedAt DateTime?
-  skpId String
-  skp   Skp    @relation(fields: [skpId], references: [id])
+  skpId     String
+  skp       Skp       @relation(fields: [skpId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -360,10 +360,10 @@ model SkpRelation {
 }
 
 model SkpLampiran {
-  id    String   @id @default(uuid())
-  name  String
-  value String[]
-  skpId String
+  id        String    @id @default(uuid())
+  name      String
+  value     String[]
+  skpId     String
   deletedAt DateTime?
 
   skp Skp @relation(fields: [skpId], references: [id])
@@ -383,10 +383,10 @@ model Rhk {
   skp   Skp    @relation(fields: [skpId], references: [id])
 
   // Parent-child relationship: one parent, many children
-  deletedAt            DateTime?
+  deletedAt   DateTime?
   parentRhkId String?
-  parentRhk   Rhk?    @relation("parentChild", fields: [parentRhkId], references: [id], onDelete: Cascade)
-  childRhks   Rhk[]   @relation("parentChild")
+  parentRhk   Rhk?      @relation("parentChild", fields: [parentRhkId], references: [id], onDelete: Cascade)
+  childRhks   Rhk[]     @relation("parentChild")
 
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
@@ -422,21 +422,21 @@ model RhkAspek {
 }
 
 model Status {
-  id      String  @id @default(uuid())
+  id        String    @id @default(uuid())
   deletedAt DateTime?
-  model   String
-  modelId String
-  value   String
-  remarks String?
+  model     String
+  modelId   String
+  value     String
+  remarks   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PeriodePenilaian {
-  deletedAt            DateTime?
-  id        String   @id @default(uuid())
-  name      String
+  deletedAt DateTime?
+  id        String    @id @default(uuid())
+  name      String    @default("")
   startDate DateTime
   endDate   DateTime
   unitId    String

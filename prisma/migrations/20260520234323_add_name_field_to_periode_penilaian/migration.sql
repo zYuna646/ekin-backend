@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE "PeriodePenilaian" ADD COLUMN     "name" TEXT NOT NULL;
+ALTER TABLE "PeriodePenilaian" ADD COLUMN     "name" TEXT;
